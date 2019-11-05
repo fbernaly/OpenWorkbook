@@ -1,9 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-void main() => runApp(Main());
+import 'home.dart';
+
+Future main() async {
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight
+  ]);
+  runApp(new Main());
+}
 
 class Main extends StatelessWidget {
   @override
@@ -33,18 +42,6 @@ class _AppState extends State<App> {
         ios: (_) => new CupertinoAppData(theme: cupertinoTheme),
         home: Home(),
       ),
-    );
-  }
-}
-
-class Home extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return PlatformScaffold(
-      appBar: PlatformAppBar(
-        title: Text('OpenWookbook'),
-      ),
-      body: Center(child: Text('Hello World')),
     );
   }
 }
