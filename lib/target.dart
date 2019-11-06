@@ -3,15 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:audioplayers/audio_cache.dart';
 
+import 'dart:math';
+
 import 'draggable.dart';
 
+typedef TargetAccept = void Function();
+
 class TargetWidget extends StatefulWidget {
-  int a;
-  int b;
+  final int a;
+  final int b;
+  final TargetAccept onOk;
 
-  TargetWidget({this.a, this.b});
+  TargetWidget({this.a, this.b, this.onOk});
 
-  createState() => TargetWidgetState(a: a, b: b);
+  createState() => TargetWidgetState(a: a, b: b, onOk: onOk);
 }
 
 class TargetWidgetState extends State<TargetWidget> {
@@ -19,9 +24,18 @@ class TargetWidgetState extends State<TargetWidget> {
   final int _maxDigits = 3;
   int a;
   int b;
+  final TargetAccept onOk;
+  final _random = new Random();
   AudioCache _plyr = AudioCache();
 
-  TargetWidgetState({this.a, this.b});
+  TargetWidgetState({this.a, this.b, this.onOk}) {
+    if (a == null) {
+      a = _next(0, 20);
+    }
+    if (b == null) {
+      b = _next(0, 10);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,6 +119,7 @@ class TargetWidgetState extends State<TargetWidget> {
   }
 
   void checkAnswer() {
+    if (numbers.length == 0) return;
     var str = "";
     numbers.forEach((number) => str += "${number.value}");
     var response = int.parse(str);
@@ -112,6 +127,18 @@ class TargetWidgetState extends State<TargetWidget> {
     if (a + b == response) {
       print("response is correct!!");
       _plyr.play('success.mp3');
+      if (onOk != null) onOk();
+      setState(() {
+        numbers = [];
+        a = _next(0, 20);
+        b = _next(0, 10);
+      });
     }
   }
+
+  /**
+   * Generates a positive random integer uniformly distributed on the range
+   * from [min], inclusive, to [max], exclusive.
+   */
+  int _next(int min, int max) => min + _random.nextInt(max - min);
 }

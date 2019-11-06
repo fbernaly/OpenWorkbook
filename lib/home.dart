@@ -39,9 +39,15 @@ class Home extends StatelessWidget {
                   return DraggableWidget(number: number);
                 }).toList()),
             Expanded(
-              child: TargetWidget(a: 5, b: 6),
+              child: TargetWidget(
+                onOk: () => onOk(),
+              ),
             ),
           ],
         ));
+  }
+
+  void onOk() {
+    print("OK!!!");
   }
 }
