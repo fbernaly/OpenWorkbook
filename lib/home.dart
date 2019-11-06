@@ -2,11 +2,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'dart:math';
 
 import 'draggable.dart';
 import 'target.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
+  createState() => HomeState();
+}
+
+class HomeState extends State<Home> {
   /// Choices for game
   final Map numbers = {
     '0⃣': 0,
@@ -20,6 +25,12 @@ class Home extends StatelessWidget {
     '8⃣': 8,
     '9⃣': 9,
   };
+
+  int a, b, minA = 0, minB = 0, maxA = 20, maxB = 10;
+
+  HomeState() {
+    _setOperators();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,19 +50,32 @@ class Home extends StatelessWidget {
                   return DraggableWidget(number: number);
                 }).toList()),
             Expanded(
-              child: TargetWidget(
-                minA: 0,
-                maxA: 10,
-                minB: 0,
-                maxB: 20,
-                onOk: () => onOk(),
+              child: new TargetWidget(
+                a: a,
+                b: b,
+                onOk: () => _onOk(),
               ),
             ),
           ],
         ));
   }
 
-  void onOk() {
+  void _onOk() {
     print("OK!!!");
+    setState(() {
+      _setOperators();
+    });
   }
+
+  void _setOperators() {
+    a = _next(minA, maxA);
+    b = _next(minB, maxB);
+  }
+
+  /**
+   * Generates a positive random integer uniformly distributed on the range
+   * from [min], inclusive, to [max], exclusive.
+   */
+  int _next(int min, int max) =>
+      min + Random(DateTime.now().millisecondsSinceEpoch).nextInt(max - min);
 }

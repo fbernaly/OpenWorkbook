@@ -3,43 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:audioplayers/audio_cache.dart';
 
-import 'dart:math';
-
 import 'draggable.dart';
 
 typedef TargetAccept = void Function();
 
 class TargetWidget extends StatefulWidget {
-  final int a;
-  final int b;
-  final int minA, minB, maxA, maxB;
-  final TargetAccept onOk;
+  TargetAccept onOk;
+  int a;
+  int b;
 
-  TargetWidget(
-      {this.a, this.b, this.minA, this.maxA, this.minB, this.maxB, this.onOk});
+  TargetWidget({this.a, this.b, this.onOk});
 
-  createState() => TargetWidgetState(
-      a: a, b: b, minA: minA, maxA: maxA, minB: minB, maxB: maxB, onOk: onOk);
+  createState() => TargetWidgetState();
 }
 
 class TargetWidgetState extends State<TargetWidget> {
   List<DraggableNumberInfo> numbers = [];
   final int _maxDigits = 3;
-  int a, b, minA, minB, maxA, maxB;
-  final TargetAccept onOk;
   AudioCache _plyr = AudioCache();
-
-  TargetWidgetState(
-      {this.a, this.b, this.minA, this.maxA, this.minB, this.maxB, this.onOk}) {
-    if (minA == null) this.minA = 0;
-    if (maxA == null) this.maxA = 20;
-    if (minB == null) this.minB = 0;
-    if (maxB == null) this.maxB = 20;
-    print("a [$minA, $maxA]");
-    print("b [$minB, $maxB]");
-    if (a == null) a = _next(minA, maxA);
-    if (b == null) b = _next(minB, maxB);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +29,7 @@ class TargetWidgetState extends State<TargetWidget> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Text(
-          "$a",
+          "${widget.a}",
           style: style,
         ),
         SizedBox(width: 8),
@@ -58,7 +39,7 @@ class TargetWidgetState extends State<TargetWidget> {
         ),
         SizedBox(width: 8),
         Text(
-          '$b',
+          '${widget.b}',
           style: style,
         ),
         SizedBox(width: 8),
@@ -128,22 +109,13 @@ class TargetWidgetState extends State<TargetWidget> {
     numbers.forEach((number) => str += "${number.value}");
     var response = int.parse(str);
     print("Current response: $response");
-    if (a + b == response) {
+    if (widget.a + widget.b == response) {
       print("response is correct!!");
       _plyr.play('success.mp3');
-      if (onOk != null) onOk();
+      if (widget.onOk != null) widget.onOk();
       setState(() {
         numbers = [];
-        a = _next(minA, maxA);
-        b = _next(minB, maxB);
       });
     }
   }
-
-  /**
-   * Generates a positive random integer uniformly distributed on the range
-   * from [min], inclusive, to [max], exclusive.
-   */
-  int _next(int min, int max) =>
-      min + Random(DateTime.now().millisecondsSinceEpoch).nextInt(max - min);
 }
