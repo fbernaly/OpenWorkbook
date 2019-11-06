@@ -107,14 +107,16 @@ class TargetWidgetState extends State<TargetWidget> {
     if (numbers.length == 0) return;
     var str = "";
     numbers.forEach((number) => str += "${number.value}");
-    var response = int.parse(str);
-    print("Current response: $response");
-    if (widget.a + widget.b == response) {
-      print("response is correct!!");
+    var answer = int.parse(str);
+    print("Current answer: $answer");
+    if (widget.a + widget.b == answer) {
+      print("answer is correct!!");
       _plyr.play('success.mp3');
-      if (widget.onOk != null) widget.onOk();
-      setState(() {
-        numbers = [];
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        setState(() {
+          numbers = [];
+          if (widget.onOk != null) widget.onOk();
+        });
       });
     }
   }

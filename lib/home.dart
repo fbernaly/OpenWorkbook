@@ -4,6 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'dart:math';
 
+import 'package:audioplayers/audio_cache.dart';
+
 import 'draggable.dart';
 import 'target.dart';
 
@@ -27,6 +29,7 @@ class HomeState extends State<Home> {
   };
 
   int a, b, minA = 0, minB = 0, maxA = 20, maxB = 10;
+  AudioCache _plyr = AudioCache();
 
   HomeState() {
     _setOperators();
@@ -56,12 +59,32 @@ class HomeState extends State<Home> {
                 onOk: () => _onOk(),
               ),
             ),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  PlatformIconButton(
+                      onPressed: () => _reload(),
+                      iosIcon: Icon(
+                        CupertinoIcons.refresh,
+                        size: 35.0,
+                      ),
+                      androidIcon: Icon(Icons.refresh, size: 35.0)),
+                  SizedBox(width: 15)
+                ]),
+            SizedBox(height: 15),
           ],
         ));
   }
 
   void _onOk() {
-    print("OK!!!");
+    setState(() {
+      _setOperators();
+    });
+  }
+
+  void _reload() {
+    _plyr.play('uhOhBaby.mp3');
     setState(() {
       _setOperators();
     });
@@ -70,6 +93,7 @@ class HomeState extends State<Home> {
   void _setOperators() {
     a = _next(minA, maxA);
     b = _next(minB, maxB);
+    print("setting operators, a: $a, b: $b");
   }
 
   /**
