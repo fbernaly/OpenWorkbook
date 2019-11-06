@@ -40,6 +40,10 @@ class Home extends StatelessWidget {
                 }).toList()),
             Expanded(
               child: TargetWidget(
+                minA: 0,
+                maxA: 10,
+                minB: 0,
+                maxB: 20,
                 onOk: () => onOk(),
               ),
             ),

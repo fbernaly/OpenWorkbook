@@ -12,29 +12,33 @@ typedef TargetAccept = void Function();
 class TargetWidget extends StatefulWidget {
   final int a;
   final int b;
+  final int minA, minB, maxA, maxB;
   final TargetAccept onOk;
 
-  TargetWidget({this.a, this.b, this.onOk});
+  TargetWidget(
+      {this.a, this.b, this.minA, this.maxA, this.minB, this.maxB, this.onOk});
 
-  createState() => TargetWidgetState(a: a, b: b, onOk: onOk);
+  createState() => TargetWidgetState(
+      a: a, b: b, minA: minA, maxA: maxA, minB: minB, maxB: maxB, onOk: onOk);
 }
 
 class TargetWidgetState extends State<TargetWidget> {
   List<DraggableNumberInfo> numbers = [];
   final int _maxDigits = 3;
-  int a;
-  int b;
+  int a, b, minA, minB, maxA, maxB;
   final TargetAccept onOk;
-  final _random = new Random();
   AudioCache _plyr = AudioCache();
 
-  TargetWidgetState({this.a, this.b, this.onOk}) {
-    if (a == null) {
-      a = _next(0, 20);
-    }
-    if (b == null) {
-      b = _next(0, 10);
-    }
+  TargetWidgetState(
+      {this.a, this.b, this.minA, this.maxA, this.minB, this.maxB, this.onOk}) {
+    if (minA == null) this.minA = 0;
+    if (maxA == null) this.maxA = 20;
+    if (minB == null) this.minB = 0;
+    if (maxB == null) this.maxB = 20;
+    print("a [$minA, $maxA]");
+    print("b [$minB, $maxB]");
+    if (a == null) a = _next(minA, maxA);
+    if (b == null) b = _next(minB, maxB);
   }
 
   @override
@@ -130,8 +134,8 @@ class TargetWidgetState extends State<TargetWidget> {
       if (onOk != null) onOk();
       setState(() {
         numbers = [];
-        a = _next(0, 20);
-        b = _next(0, 10);
+        a = _next(minA, maxA);
+        b = _next(minB, maxB);
       });
     }
   }
@@ -140,5 +144,6 @@ class TargetWidgetState extends State<TargetWidget> {
    * Generates a positive random integer uniformly distributed on the range
    * from [min], inclusive, to [max], exclusive.
    */
-  int _next(int min, int max) => min + _random.nextInt(max - min);
+  int _next(int min, int max) =>
+      min + Random(DateTime.now().millisecondsSinceEpoch).nextInt(max - min);
 }
