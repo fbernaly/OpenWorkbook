@@ -34,10 +34,12 @@ class Home extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: numbers.keys.map((emoji) {
-                  return DraggableWidget(emoji: emoji);
+                  var number =
+                      DraggableNumberInfo(emoji: emoji, value: numbers[emoji]);
+                  return DraggableWidget(number: number);
                 }).toList()),
             Expanded(
-              child: TargetWidget(),
+              child: TargetWidget(a: 5, b: 6),
             ),
           ],
         ));
