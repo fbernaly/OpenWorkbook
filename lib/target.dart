@@ -78,8 +78,16 @@ class TargetWidgetState extends State<TargetWidget> {
           width: 150,
         );
       },
-      onWillAccept: (number) =>
-          number.index == null && (numbers.length + 1 <= _maxDigits),
+      onWillAccept: (number) {
+        if (number.index != null) {
+          _plyr.play('uhOhBaby.mp3');
+          return false;
+        }
+        var accept = numbers.length + 1 <= _maxDigits;
+        if (!accept)
+          _plyr.play('error.mp3');
+        return accept;
+      },
       onAccept: (number) {
         print("Adding: ${number.emoji}");
         setState(() {

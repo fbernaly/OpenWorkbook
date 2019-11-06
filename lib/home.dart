@@ -28,7 +28,7 @@ class HomeState extends State<Home> {
     '9⃣': 9,
   };
 
-  int a, b, minA = 0, minB = 0, maxA = 20, maxB = 10;
+  int a, b, minA = 0, minB = 0, maxA = 10, maxB = 2;
   AudioCache _plyr = AudioCache();
 
   HomeState() {
@@ -40,6 +40,14 @@ class HomeState extends State<Home> {
     return PlatformScaffold(
         appBar: PlatformAppBar(
           title: Text('Open Workbook'),
+          trailingActions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.edit),
+              onPressed: () {
+                print(">>>>> ");
+              },
+            ),
+          ],
         ),
         body: Column(
           children: <Widget>[
@@ -66,10 +74,10 @@ class HomeState extends State<Home> {
                   PlatformIconButton(
                       onPressed: () => _reload(),
                       iosIcon: Icon(
-                        CupertinoIcons.refresh,
+                        CupertinoIcons.delete,
                         size: 35.0,
                       ),
-                      androidIcon: Icon(Icons.refresh, size: 35.0)),
+                      androidIcon: Icon(Icons.delete, size: 35.0)),
                   SizedBox(width: 15)
                 ]),
             SizedBox(height: 15),
@@ -84,15 +92,23 @@ class HomeState extends State<Home> {
   }
 
   void _reload() {
-    _plyr.play('uhOhBaby.mp3');
+    _plyr.play('swoosh.mp3');
     setState(() {
       _setOperators();
     });
   }
 
   void _setOperators() {
-    a = _next(minA, maxA);
-    b = _next(minB, maxB);
+    var a = this.a;
+    do {
+      a = _next(minA, maxA);
+    } while (this.a == a);
+    this.a = a;
+    var b = this.b;
+    do {
+      b = _next(minB, maxB);
+    } while (this.b == b);
+    this.b = b;
     print("setting operators, a: $a, b: $b");
   }
 
