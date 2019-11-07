@@ -6,14 +6,15 @@ import 'package:audioplayers/audio_cache.dart';
 
 import 'package:flutter_app/draggable.dart';
 
-typedef TargetAccept = void Function();
+import 'package:flutter_app/math_operation.dart';
 
 class AdditionWidget extends StatefulWidget {
-  TargetAccept onOk;
   int a;
   int b;
+  MathOperation operation;
+  void Function() onOk;
 
-  AdditionWidget({this.a, this.b, this.onOk});
+  AdditionWidget({this.a, this.b, this.operation, this.onOk});
 
   createState() => AdditionState();
 }
@@ -35,7 +36,7 @@ class AdditionState extends State<AdditionWidget> {
         ),
         SizedBox(width: 8),
         Text(
-          '+',
+          _getOperationStr(),
           style: style,
         ),
         SizedBox(width: 8),
@@ -52,6 +53,12 @@ class AdditionState extends State<AdditionWidget> {
         _buildDragTarget(),
       ],
     );
+  }
+
+  String _getOperationStr() {
+    if (widget.operation == MathOperation.addition) return "+";
+    if (widget.operation == MathOperation.subtraction) return "-";
+    return "";
   }
 
   Widget _buildDragTarget() {
@@ -89,7 +96,7 @@ class AdditionState extends State<AdditionWidget> {
         return accept;
       },
       onAccept: (number) {
-        print("Adding: ${number.emoji}");
+        print("Dragging in: ${number.emoji}");
         setState(() {
           numbers.add(DraggableNumberInfo.from(number));
           checkAnswer();
@@ -102,7 +109,7 @@ class AdditionState extends State<AdditionWidget> {
         var emoji = number.emoji;
         if (numbers.length <= i) return;
         if (numbers[i].emoji != emoji) return;
-        print("Removing: $emoji at index $i");
+        print("Dragging out: $emoji at index $i");
         setState(() {
           numbers.removeAt(i);
           checkAnswer();
@@ -116,8 +123,18 @@ class AdditionState extends State<AdditionWidget> {
     var str = "";
     numbers.forEach((number) => str += "${number.value}");
     var answer = int.parse(str);
-    print("Current answer: $answer");
-    if (widget.a + widget.b == answer) {
+    String symbol = "";
+    bool correct = false;
+    if (widget.operation == MathOperation.addition) {
+      symbol = "+";
+      correct = (widget.a + widget.b) == answer;
+    } else if (widget.operation == MathOperation.subtraction) {
+      symbol = "-";
+      correct = (widget.a - widget.b) == answer;
+    }
+    print(
+        "Checking answer: ${widget.a} $symbol ${widget.b} ${correct ? "=" : "/="} $answer");
+    if (correct) {
       print("answer is correct!!");
       _plyr.play('success.mp3');
       Future.delayed(const Duration(milliseconds: 1000), () {

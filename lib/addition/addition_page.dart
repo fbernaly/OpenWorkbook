@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 
 import 'package:audioplayers/audio_cache.dart';
+import 'package:flutter_app/math_operation.dart';
 
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
@@ -32,11 +33,13 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
     '9⃣': 9,
   };
 
-  int a, b, minA = 0, minB = 0, maxA = 10, maxB = 2;
+  int a, b;
+  MathOperation operation;
+  ConfigAddition config = ConfigAddition();
   AudioCache _plyr = AudioCache();
 
-  HomeState() {
-    _setOperators();
+  AdditionSubtractionState() {
+    _setOperation();
   }
 
   @override
@@ -45,11 +48,11 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
         [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
     return PlatformScaffold(
         appBar: PlatformAppBar(
-          title: Text('Open Workbook'),
+          title: Text('Addition/Subtraction Dojo'),
           trailingActions: <Widget>[
             IconButton(
               icon: Icon(Icons.edit),
-              onPressed: () => _edit(),
+              onPressed: () => _config(),
             ),
           ],
         ),
@@ -68,6 +71,7 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
               child: new AdditionWidget(
                 a: a,
                 b: b,
+                operation: operation,
                 onOk: () => _onOk(),
               ),
             ),
@@ -89,8 +93,8 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
         ));
   }
 
-  void _edit() {
-    WidgetBuilder pageToDisplayBuilder = (_) => ConfigAdditionPage();
+  void _config() {
+    WidgetBuilder pageToDisplayBuilder = (_) => ConfigAdditionPage(config);
     Navigator.push(
       context,
       platformPageRoute(
@@ -102,29 +106,49 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
 
   void _onOk() {
     setState(() {
-      _setOperators();
+      _setOperation();
     });
   }
 
   void _reload() {
     _plyr.play('swoosh.mp3');
     setState(() {
-      _setOperators();
+      _setOperation();
     });
   }
 
-  void _setOperators() {
+  void _setOperation() {
+    print("config:\n$config");
+    if (config.operations.length == 1 &&
+        config.operations.contains(MathOperation.addition)) {
+      operation = MathOperation.addition;
+    } else if (config.operations.length == 1 &&
+        config.operations.contains(MathOperation.subtraction)) {
+      operation = MathOperation.subtraction;
+    } else if (config.operations.length == 2 &&
+        config.operations.contains(MathOperation.addition) &&
+        config.operations.contains(MathOperation.subtraction)) {
+      int i = Random(DateTime.now().millisecondsSinceEpoch).nextInt(100) % 2;
+      operation = config.operations[i];
+    }
     var a = this.a;
     do {
-      a = _next(minA, maxA);
+      a = _next(config.minA, config.maxA);
     } while (this.a == a);
     this.a = a;
     var b = this.b;
     do {
-      b = _next(minB, maxB);
+      b = _next(config.minB, config.maxB);
     } while (this.b == b);
     this.b = b;
-    print("setting operators, a: $a, b: $b");
+    String symbol = operation == MathOperation.addition
+        ? "+"
+        : (operation == MathOperation.subtraction ? "-" : "");
+    print("new operation: $a $symbol $b");
+    if (operation == MathOperation.subtraction && (a - b) < 0) {
+      print("operations with negative result are not allowed, setting a new one...");
+      _setOperation();
+    }
   }
 
   /**
