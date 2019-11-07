@@ -1,23 +1,24 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+
 import 'package:audioplayers/audio_cache.dart';
 
-import 'draggable.dart';
+import 'package:flutter_app/draggable.dart';
 
 typedef TargetAccept = void Function();
 
-class TargetWidget extends StatefulWidget {
+class AdditionWidget extends StatefulWidget {
   TargetAccept onOk;
   int a;
   int b;
 
-  TargetWidget({this.a, this.b, this.onOk});
+  AdditionWidget({this.a, this.b, this.onOk});
 
-  createState() => TargetWidgetState();
+  createState() => AdditionState();
 }
 
-class TargetWidgetState extends State<TargetWidget> {
+class AdditionState extends State<AdditionWidget> {
   List<DraggableNumberInfo> numbers = [];
   final int _maxDigits = 3;
   AudioCache _plyr = AudioCache();
@@ -67,7 +68,7 @@ class TargetWidgetState extends State<TargetWidget> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: numbers.map((number) {
               number.index = i++;
-              return DraggableWidget(number: number);
+              return DraggableNumber(number: number);
             }).toList(),
           );
         }
@@ -84,8 +85,7 @@ class TargetWidgetState extends State<TargetWidget> {
           return false;
         }
         var accept = numbers.length + 1 <= _maxDigits;
-        if (!accept)
-          _plyr.play('error.mp3');
+        if (!accept) _plyr.play('error.mp3');
         return accept;
       },
       onAccept: (number) {

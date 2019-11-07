@@ -1,16 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter/services.dart';
+
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-import 'home.dart';
+import 'package:flutter_app/addition/addition_page.dart';
 
-Future main() async {
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight
-  ]);
+void main() {
   runApp(new Main());
 }
 
@@ -40,7 +36,7 @@ class _AppState extends State<App> {
         title: 'Flutter Platform Widgets',
         android: (_) => new MaterialAppData(theme: themeData),
         ios: (_) => new CupertinoAppData(theme: cupertinoTheme),
-        home: Home(),
+        home: AdditionSubtractionPage(),
       ),
     );
   }

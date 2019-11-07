@@ -1,19 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'dart:math';
+import 'package:flutter/services.dart';
 
 import 'package:audioplayers/audio_cache.dart';
 
-import 'draggable.dart';
-import 'target.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-class Home extends StatefulWidget {
-  createState() => HomeState();
+import 'dart:math';
+
+import 'package:flutter_app/addition/addition_widget.dart';
+import 'package:flutter_app/addition/config_addition_page.dart';
+import 'package:flutter_app/draggable.dart';
+
+class AdditionSubtractionPage extends StatefulWidget {
+  createState() => AdditionSubtractionState();
 }
 
-class HomeState extends State<Home> {
+class AdditionSubtractionState extends State<AdditionSubtractionPage> {
   /// Choices for game
   final Map numbers = {
     '0⃣': 0,
@@ -37,15 +41,15 @@ class HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
     return PlatformScaffold(
         appBar: PlatformAppBar(
           title: Text('Open Workbook'),
           trailingActions: <Widget>[
             IconButton(
               icon: Icon(Icons.edit),
-              onPressed: () {
-                print(">>>>> ");
-              },
+              onPressed: () => _edit(),
             ),
           ],
         ),
@@ -58,10 +62,10 @@ class HomeState extends State<Home> {
                 children: numbers.keys.map((emoji) {
                   var number =
                       DraggableNumberInfo(emoji: emoji, value: numbers[emoji]);
-                  return DraggableWidget(number: number);
+                  return DraggableNumber(number: number);
                 }).toList()),
             Expanded(
-              child: new TargetWidget(
+              child: new AdditionWidget(
                 a: a,
                 b: b,
                 onOk: () => _onOk(),
@@ -83,6 +87,17 @@ class HomeState extends State<Home> {
             SizedBox(height: 15),
           ],
         ));
+  }
+
+  void _edit() {
+    WidgetBuilder pageToDisplayBuilder = (_) => ConfigAdditionPage();
+    Navigator.push(
+      context,
+      platformPageRoute(
+        context: context,
+        builder: pageToDisplayBuilder,
+      ),
+    );
   }
 
   void _onOk() {

@@ -16,8 +16,8 @@ class DraggableNumberInfo {
   }
 }
 
-class DraggableWidget extends StatelessWidget {
-  DraggableWidget({Key key, this.number}) : super(key: key);
+class DraggableNumber extends StatelessWidget {
+  DraggableNumber({Key key, this.number}) : super(key: key);
 
   final DraggableNumberInfo number;
 
