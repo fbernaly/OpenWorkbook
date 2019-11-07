@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -23,6 +25,7 @@ class AdditionState extends State<AdditionWidget> {
   List<DraggableNumberInfo> numbers = [];
   final int _maxDigits = 3;
   AudioCache _plyr = AudioCache();
+  Timer t;
 
   @override
   Widget build(BuildContext context) {
@@ -119,6 +122,7 @@ class AdditionState extends State<AdditionWidget> {
   }
 
   void checkAnswer() {
+    t?.cancel();
     if (numbers.length == 0) return;
     var str = "";
     numbers.forEach((number) => str += "${number.value}");
@@ -141,6 +145,13 @@ class AdditionState extends State<AdditionWidget> {
         setState(() {
           numbers = [];
           if (widget.onOk != null) widget.onOk();
+        });
+      });
+    } else {
+      t = Timer(Duration(seconds: 5), () {
+        _plyr.play("error.mp3");
+        setState(() {
+          numbers = [];
         });
       });
     }
