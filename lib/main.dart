@@ -4,10 +4,10 @@ import 'package:flutter/widgets.dart';
 
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-import 'package:flutter_app/addition/addition_page.dart';
+import 'package:flutter_app/home.dart';
 
 void main() {
-  runApp(new Main());
+  runApp(Main());
 }
 
 class Main extends StatelessWidget {
@@ -36,7 +36,7 @@ class _AppState extends State<App> {
         title: 'Flutter Platform Widgets',
         android: (_) => new MaterialAppData(theme: themeData),
         ios: (_) => new CupertinoAppData(theme: cupertinoTheme),
-        home: AdditionSubtractionPage(),
+        home: Home(),
       ),
     );
   }
