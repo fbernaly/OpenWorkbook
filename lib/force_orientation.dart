@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 
+import 'dart:io' show Platform;
+
 class ForceOrientation {
   static const _rotationChannel =
       const MethodChannel('com.openworkbook.orientation');
@@ -11,9 +13,11 @@ class ForceOrientation {
         DeviceOrientation.landscapeLeft,
         DeviceOrientation.landscapeRight,
       ]);
-      try {
-        _rotationChannel.invokeMethod('setLandscape');
-      } catch (error) {}
+      if (Platform.isIOS) {
+        try {
+          _rotationChannel.invokeMethod('setLandscape');
+        } catch (error) {}
+      }
     }
   }
 
@@ -23,9 +27,11 @@ class ForceOrientation {
         DeviceOrientation.portraitUp,
         DeviceOrientation.portraitDown,
       ]);
-      try {
-        _rotationChannel.invokeMethod('setPortrait');
-      } catch (error) {}
+      if (Platform.isIOS) {
+        try {
+          _rotationChannel.invokeMethod('setPortrait');
+        } catch (error) {}
+      }
     }
   }
 }
