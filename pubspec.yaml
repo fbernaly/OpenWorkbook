@@ -47,7 +47,9 @@ flutter:
     - 'error.mp3'
     - 'uhOhBaby.mp3'
     - 'swoosh.mp3'
-  #  - images/a_dot_ham.jpeg
+    - 'addition-and-subtraction-signs.png'
+    - 'less-than-greater-than-signs.png'
+    - 'number_bonds.png'
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
