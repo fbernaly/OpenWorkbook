@@ -3,11 +3,16 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app/math_operation.dart';
 
+import 'dart:io' show Platform;
+
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+
 import 'package:grouped_buttons/grouped_buttons.dart';
 
+import 'package:flutter_app/force_orientation.dart';
+
 class ConfigAddition {
-  int minA = 0, minB = 0, maxA = 10, maxB = 2;
+  int minA = 10, minB = 2, maxA = 20, maxB = 9;
   List<MathOperation> operations = [MathOperation.addition];
 
   @override
@@ -62,10 +67,7 @@ class ConfigAdditionPageState extends State<ConfigAdditionPage> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
+    ForceOrientation.setPortrait(context);
     var textStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0);
     return PlatformScaffold(
       appBar: PlatformAppBar(

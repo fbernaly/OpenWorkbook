@@ -4,15 +4,17 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 
 import 'package:audioplayers/audio_cache.dart';
-import 'package:flutter_app/math_operation.dart';
 
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import 'dart:math';
+import 'dart:io' show Platform;
 
 import 'package:flutter_app/addition/addition_widget.dart';
 import 'package:flutter_app/addition/config_addition_page.dart';
 import 'package:flutter_app/draggable.dart';
+import 'package:flutter_app/math_operation.dart';
+import 'package:flutter_app/force_orientation.dart';
 
 class AdditionSubtractionPage extends StatefulWidget {
   createState() => AdditionSubtractionState();
@@ -44,8 +46,7 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setPreferredOrientations(
-        [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+    ForceOrientation.setLandscape(context);
     return PlatformScaffold(
         appBar: PlatformAppBar(
           title: Text('Addition/Subtraction Dojo'),
