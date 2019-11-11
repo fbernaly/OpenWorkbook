@@ -79,6 +79,7 @@ class ConfigAdditionPageState extends State<ConfigAdditionPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            SizedBox(height: Platform.isIOS ? 100 : 0),
             Text('Operation', style: textStyle),
             _radioButtonGroup(),
             Text('1st Number', style: textStyle),

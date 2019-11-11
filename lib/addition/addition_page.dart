@@ -59,7 +59,7 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
         ),
         body: Column(
           children: <Widget>[
-            SizedBox(height: 10),
+            SizedBox(height: Platform.isIOS ? 60 : 10),
             Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,10 +83,10 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
                   PlatformIconButton(
                       onPressed: () => _reload(),
                       iosIcon: Icon(
-                        CupertinoIcons.delete,
+                        CupertinoIcons.refresh,
                         size: 35.0,
                       ),
-                      androidIcon: Icon(Icons.delete, size: 35.0)),
+                      androidIcon: Icon(Icons.refresh, size: 35.0)),
                   SizedBox(width: 15)
                 ]),
             SizedBox(height: 15),
@@ -147,7 +147,8 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
         : (operation == MathOperation.subtraction ? "-" : "");
     print("new operation: $a $symbol $b");
     if (operation == MathOperation.subtraction && (a - b) < 0) {
-      print("operations with negative result are not allowed, setting a new one...");
+      print(
+          "operations with negative result are not allowed, setting a new one...");
       _setOperation();
     }
   }
