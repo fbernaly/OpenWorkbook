@@ -58,6 +58,7 @@ class NumberBondState extends State<NumberBondPage> {
                 child: NumberBondWidget(
                   a: a,
                   b: b,
+                  c: c,
                   onOk: () => _onOk(),
                 ),
               ),
@@ -104,22 +105,44 @@ class NumberBondState extends State<NumberBondPage> {
   }
 
   void _setOperation() {
-    var a = this.a;
+    if (config.max - config.min <= 1) return;
+    var c = this.c;
     do {
-      a = RandomGenerator.generate(
+      c = RandomGenerator.generate(
           seed: DateTime.now().millisecondsSinceEpoch,
           min: config.min,
           max: config.max);
-    } while (this.a == a);
-    this.a = a;
-    var b = this.b;
-    do {
-      b = RandomGenerator.generate(
-          seed: DateTime.now().millisecondsSinceEpoch + 1,
-          min: config.min,
-          max: config.max);
-    } while (this.b == b);
-    this.b = b;
-    print("new operation: $a + $b");
+    } while (this.c == c);
+    this.c = c;
+
+    if (c == 0) {
+      this.a = 0;
+    } else {
+      var a = this.a;
+      do {
+        a = RandomGenerator.generate(
+            seed: DateTime.now().millisecondsSinceEpoch + 1, min: 0, max: c);
+      } while (this.a == a);
+      this.a = a;
+    }
+
+    this.b = c - a;
+
+    print("new operation: $a + $b = $c");
+
+    var i = RandomGenerator.generate(
+            seed: DateTime.now().millisecondsSinceEpoch + 2, min: 0, max: 100) %
+        4;
+    print(">>>> i $i");
+    if (i == 0) {
+      this.c = null;
+    } else if (i == 1) {
+      this.a = null;
+    } else if (i == 2) {
+      this.b = null;
+    } else if (i == 3) {
+      this.a = null;
+      this.b = null;
+    }
   }
 }

@@ -33,14 +33,16 @@ class NumberBondState extends State<NumberBondWidget> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         _widgetC = _buildDragTarget(
-            radius: radius, numbers: _numbersC, interactable: true),
+            radius: radius, value: widget.c, numbers: _numbersC),
         Text('/              \\'),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            _widgetA = _buildDragTarget(radius: radius, value: widget.a),
+            _widgetA = _buildDragTarget(
+                radius: radius, value: widget.a, numbers: _numbersA),
             SizedBox(width: 20),
-            _widgetB = _buildDragTarget(radius: radius, value: widget.b),
+            _widgetB = _buildDragTarget(
+                radius: radius, value: widget.b, numbers: _numbersB),
           ],
         ),
       ],
@@ -48,10 +50,8 @@ class NumberBondState extends State<NumberBondWidget> {
   }
 
   Widget _buildDragTarget(
-      {double radius,
-      int value,
-      List<DraggableNumberInfo> numbers,
-      bool interactable = false}) {
+      {double radius, int value, List<DraggableNumberInfo> numbers}) {
+    bool interactable = value == null;
     var style = TextStyle(color: Colors.black, fontSize: 30);
     return DragTarget<DraggableNumberInfo>(
       builder: (BuildContext context, List<DraggableNumberInfo> incoming,
