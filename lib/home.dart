@@ -4,6 +4,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'dart:io' show Platform;
 
 import 'package:flutter_app/addition/addition_page.dart';
+import 'package:flutter_app/number_bond/number_bond_page.dart';
 import 'package:flutter_app/force_orientation.dart';
 
 class Home extends StatefulWidget {
@@ -62,7 +63,7 @@ class HomeState extends State<Home> {
                     shape: BoxShape.circle,
                     color: _current == index
                         ? Colors.purple
-                        : Colors.deepPurpleAccent,
+                        : Colors.purple.withAlpha(100),
                   ),
                 );
               }),
@@ -117,7 +118,7 @@ class HomeState extends State<Home> {
     if (_current != index) carouselSlider.jumpToPage(index);
     if (index == 0) _showAdditionPage();
     if (index == 1) _showComparisonPage();
-    if (index == 2) _showNumberBondsPage();
+    if (index == 2) _showNumberBondPage();
   }
 
   void _showAdditionPage() {
@@ -133,5 +134,14 @@ class HomeState extends State<Home> {
 
   void _showComparisonPage() {}
 
-  void _showNumberBondsPage() {}
+  void _showNumberBondPage() {
+    WidgetBuilder pageToDisplayBuilder = (_) => NumberBondPage();
+    Navigator.push(
+      context,
+      platformPageRoute(
+        context: context,
+        builder: pageToDisplayBuilder,
+      ),
+    );
+  }
 }
