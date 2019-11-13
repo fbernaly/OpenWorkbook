@@ -21,6 +21,27 @@ class DraggableNumber extends StatelessWidget {
 
   final DraggableNumberInfo number;
 
+  static List<DraggableNumber> getNumbers() {
+    /// Choices for game
+    final Map numbers = {
+      '0⃣': 0,
+      '1⃣': 1,
+      '2⃣': 2,
+      '3⃣': 3,
+      '4⃣': 4,
+      '5⃣': 5,
+      '6⃣': 6,
+      '7⃣': 7,
+      '8⃣': 8,
+      '9⃣': 9,
+    };
+    return numbers.keys.map((emoji) {
+      int value = numbers[emoji];
+      var number = DraggableNumberInfo(emoji: emoji, value: value);
+      return DraggableNumber(number: number);
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Draggable<DraggableNumberInfo>(
