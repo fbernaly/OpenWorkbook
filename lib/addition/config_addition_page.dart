@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_app/math_operation.dart';
 
 import 'dart:io' show Platform;
 
@@ -10,6 +9,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
 
 import 'package:flutter_app/force_orientation.dart';
+import 'package:flutter_app/math_operation.dart';
 
 class ConfigAddition {
   int minA = 10, minB = 2, maxA = 20, maxB = 9;
@@ -33,7 +33,6 @@ class ConfigAdditionPage extends StatefulWidget {
 }
 
 class ConfigAdditionPageState extends State<ConfigAdditionPage> {
-  double sliderValue = 0.5;
   TextEditingController textControlllerMinA;
   TextEditingController textControlllerMinB;
   TextEditingController textControlllerMaxA;

@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 
 import 'package:audioplayers/audio_cache.dart';
 
-import 'package:flutter_app/draggable.dart';
+import 'package:flutter_app/draggable/number.dart';
 
 import 'package:flutter_app/math_operation.dart';
 
@@ -82,11 +82,14 @@ class AdditionState extends State<AdditionWidget> {
             }).toList(),
           );
         }
-        return Container(
-          color: Colors.grey,
-          child: child,
-          height: 80,
-          width: 150,
+        return ClipRRect(
+          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+          child: Container(
+            color: Colors.purple.withAlpha(35),
+            child: child,
+            height: 80,
+            width: 150,
+          ),
         );
       },
       onWillAccept: (number) {
