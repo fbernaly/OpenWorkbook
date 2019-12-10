@@ -1,0 +1,5 @@
+
+enum CompareOperation {
+  higher,
+  less,
+}

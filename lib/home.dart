@@ -5,6 +5,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter_app/addition/addition_page.dart';
 import 'package:flutter_app/number_bond/number_bond_page.dart';
+import 'package:flutter_app/comparison/comparison_page.dart';
 import 'package:flutter_app/force_orientation.dart';
 
 class Home extends StatefulWidget {
@@ -132,7 +133,16 @@ class HomeState extends State<Home> {
     );
   }
 
-  void _showComparisonPage() {}
+  void _showComparisonPage() {
+    WidgetBuilder pageToDisplayBuilder = (_) => ComparisonPage();
+    Navigator.push(
+      context,
+      platformPageRoute(
+        context: context,
+        builder: pageToDisplayBuilder,
+      ),
+    );
+  }
 
   void _showNumberBondPage() {
     WidgetBuilder pageToDisplayBuilder = (_) => NumberBondPage();
