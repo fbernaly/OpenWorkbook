@@ -23,7 +23,7 @@ class AdditionWidget extends StatefulWidget {
 
 class AdditionState extends State<AdditionWidget> {
   List<DraggableOperationsInfo> numbers = [];
-  final int _maxDigits = 3;
+  final int _maxDigits = 1;
   AudioCache _plyr = AudioCache();
   Timer t;
 
@@ -45,7 +45,6 @@ class AdditionState extends State<AdditionWidget> {
           style: style,
         ),
         SizedBox(width: 8),
-
       ],
     );
   }
@@ -88,7 +87,7 @@ class AdditionState extends State<AdditionWidget> {
         return accept;
       },
       onAccept: (number) {
-        print("Dragging in: ${number.emoji}");
+        print("Dragging in: ${number.value}");
         setState(() {
           numbers.add(DraggableOperationsInfo.from(number));
           checkAnswer();
@@ -98,10 +97,10 @@ class AdditionState extends State<AdditionWidget> {
         if (numbers.length == 0) return;
         var i = number.index;
         if (i == null) return;
-        var emoji = number.emoji;
+        var value = number.value;
         if (numbers.length <= i) return;
-        if (numbers[i].emoji != emoji) return;
-        print("Dragging out: $emoji at index $i");
+        if (numbers[i].value != value) return;
+        print("Dragging out: $value at index $i");
         setState(() {
           numbers.removeAt(i);
           checkAnswer();
@@ -114,38 +113,19 @@ class AdditionState extends State<AdditionWidget> {
     t?.cancel();
     if (numbers.length == 0) return;
     var str = "";
-    numbers.forEach((number) => str += "${number.value}");
-    var answer = int.parse(str);
-    String symbol = "";
+    String symbol = numbers[0].value;
+    print("symbol: $symbol");
     bool correct = false;
-    if (answer == 0) {
-      symbol = "<";
-      if (widget.a < widget.b) {
-        correct = true;
-      }else {
-        correct = false;
-      }
-    } else if (answer == 2) {
-      symbol = ">";
-      if (widget.a < widget.b) {
-        correct = true;
-      }else {
-        correct = false;
-      }
-    } else if (answer == 1){
-      symbol = "=";
-      if (widget.a == widget.b) {
-        correct = true;
-      }else {
-        correct = false;
-      }
-    } else{
-      correct = false;
+    if (symbol == "<") {
+      correct = widget.a < widget.b;
+    } else if (symbol == ">") {
+      correct = widget.a > widget.b;
+    } else if (symbol == "=") {
+      correct = widget.a == widget.b;
     }
     print(
-        "Checking answer: ${widget.a} $symbol ${widget.b} ${correct ? "=" : "/="} $answer");
+        "Checking answer: ${widget.a} $symbol ${widget.b} is ${correct ? "correct" : "incorrect"} ");
     if (correct) {
-      print("answer is correct!!");
       _plyr.play('success.mp3');
       Future.delayed(const Duration(milliseconds: 1000), () {
         setState(() {
@@ -154,7 +134,7 @@ class AdditionState extends State<AdditionWidget> {
         });
       });
     } else {
-      t = Timer(Duration(seconds: 5), () {
+      t = Timer(Duration(milliseconds: 500), () {
         _plyr.play("error.mp3");
         setState(() {
           numbers = [];

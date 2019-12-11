@@ -65,8 +65,8 @@ class ComparisonState extends State<ComparisonPage> {
             ],
           ),
           Positioned(
-            right: 50.0,
-            bottom: 50.0,
+            right: 16.0,
+            bottom: 16.0,
             child: PlatformIconButton(
                 onPressed: () => _reload(),
                 iosIcon: Icon(
@@ -119,10 +119,9 @@ class ComparisonState extends State<ComparisonPage> {
     do {
       b = RandomGenerator.generate(
           seed: DateTime.now().millisecondsSinceEpoch + 1,
-          min: config.minB,
-          max: config.maxB);
+          min: config.min,
+          max: config.max);
     } while (this.b == b);
     this.b = b;
-
   }
 }

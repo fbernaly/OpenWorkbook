@@ -3,14 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class DraggableOperationsInfo {
-  String emoji;
-  int value;
+  String value;
   int index;
 
-  DraggableOperationsInfo({this.emoji, this.value, this.index});
+  DraggableOperationsInfo({this.value, this.index});
 
   DraggableOperationsInfo.from(DraggableOperationsInfo info) {
-    this.emoji = info.emoji;
     this.value = info.value;
     this.index = info.index;
   }
@@ -23,14 +21,13 @@ class DraggableOperation extends StatelessWidget {
 
   static List<DraggableOperation> getOperations() {
     /// Choices for game
-    final Map numbers = {
-      '<⃣': 0,
-      '=⃣': 1,
-      '>⃣': 2,
-    };
-    return numbers.keys.map((emoji) {
-      int value = numbers[emoji];
-      var number = DraggableOperationsInfo(emoji: emoji, value: value);
+    final List<String> numbers = [
+      "<",
+      "=",
+      ">",
+    ];
+    return numbers.map((value) {
+      var number = DraggableOperationsInfo(value: value);
       return DraggableOperation(number: number);
     }).toList();
   }
@@ -46,10 +43,18 @@ class DraggableOperation extends StatelessWidget {
   }
 
   Widget _buildDraggableWidget() {
-    return Container(
-      child: Text(
-        number.emoji,
-        style: TextStyle(color: Colors.black, fontSize: 30),
+    return ClipRRect(
+      borderRadius: BorderRadius.all(Radius.circular(5.0)),
+      child: Container(
+        color: Colors.purple.withAlpha(35),
+        child: Center(
+          child: Text(
+            number.value,
+            style: TextStyle(color: Colors.black, fontSize: 30),
+          ),
+        ),
+        height: 40,
+        width: 40,
       ),
     );
   }
