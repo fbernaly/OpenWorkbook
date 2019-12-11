@@ -3,14 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class DraggableNumberInfo {
-  String emoji;
   int value;
   int index;
 
-  DraggableNumberInfo({this.emoji, this.value, this.index});
+  DraggableNumberInfo({this.value, this.index});
 
   DraggableNumberInfo.from(DraggableNumberInfo info) {
-    this.emoji = info.emoji;
     this.value = info.value;
     this.index = info.index;
   }
@@ -23,21 +21,20 @@ class DraggableNumber extends StatelessWidget {
 
   static List<DraggableNumber> getNumbers() {
     /// Choices for game
-    final Map numbers = {
-      '0⃣': 0,
-      '1⃣': 1,
-      '2⃣': 2,
-      '3⃣': 3,
-      '4⃣': 4,
-      '5⃣': 5,
-      '6⃣': 6,
-      '7⃣': 7,
-      '8⃣': 8,
-      '9⃣': 9,
-    };
-    return numbers.keys.map((emoji) {
-      int value = numbers[emoji];
-      var number = DraggableNumberInfo(emoji: emoji, value: value);
+    final List<int> numbers = [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+    ];
+    return numbers.map((value) {
+      var number = DraggableNumberInfo(value: value);
       return DraggableNumber(number: number);
     }).toList();
   }
@@ -54,10 +51,20 @@ class DraggableNumber extends StatelessWidget {
 
   Widget _buildDraggableWidget() {
     return Container(
-      child: Text(
-        number.emoji,
-        style: TextStyle(color: Colors.black, fontSize: 30),
+      margin: EdgeInsets.all(1.0),
+      decoration: BoxDecoration(
+        color: Colors.purple.withAlpha(35),
+        border: Border.all(color: Colors.purple.withAlpha(85), width: 3.0),
+        borderRadius: BorderRadius.all(Radius.circular(5.0)),
       ),
+      child: Center(
+        child: Text(
+          "${number.value}",
+          style: TextStyle(color: Colors.black, fontSize: 30),
+        ),
+      ),
+      height: 40,
+      width: 40,
     );
   }
 }

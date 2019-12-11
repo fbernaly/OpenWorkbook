@@ -43,19 +43,21 @@ class DraggableOperation extends StatelessWidget {
   }
 
   Widget _buildDraggableWidget() {
-    return ClipRRect(
-      borderRadius: BorderRadius.all(Radius.circular(5.0)),
-      child: Container(
+    return Container(
+      margin: EdgeInsets.all(1.0),
+      decoration: BoxDecoration(
         color: Colors.purple.withAlpha(35),
-        child: Center(
-          child: Text(
-            number.value,
-            style: TextStyle(color: Colors.black, fontSize: 30),
-          ),
-        ),
-        height: 40,
-        width: 40,
+        border: Border.all(color: Colors.purple.withAlpha(85), width: 3.0),
+        borderRadius: BorderRadius.all(Radius.circular(5.0)),
       ),
+      child: Center(
+        child: Text(
+          number.value,
+          style: TextStyle(color: Colors.black, fontSize: 30),
+        ),
+      ),
+      height: 40,
+      width: 40,
     );
   }
 }

@@ -1,5 +1,0 @@
-
-enum CompareOperation {
-  higher,
-  less,
-}

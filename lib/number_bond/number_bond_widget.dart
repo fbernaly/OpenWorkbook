@@ -101,7 +101,7 @@ class NumberBondState extends State<NumberBondWidget> {
         return accept;
       },
       onAccept: (number) {
-        print("Dragging in: ${number.emoji}");
+        print("Dragging in: ${number.value}");
         setState(() {
           numbers.add(DraggableNumberInfo.from(number));
           checkAnswer();
@@ -112,10 +112,10 @@ class NumberBondState extends State<NumberBondWidget> {
         if (numbers.length == 0) return;
         var i = number.index;
         if (i == null) return;
-        var emoji = number.emoji;
+        var value = number.value;
         if (numbers.length <= i) return;
-        if (numbers[i].emoji != emoji) return;
-        print("Dragging out: $emoji at index $i");
+        if (numbers[i].value != value) return;
+        print("Dragging out: $value at index $i");
         setState(() {
           numbers.removeAt(i);
           checkAnswer();
