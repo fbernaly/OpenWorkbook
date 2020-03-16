@@ -107,9 +107,10 @@ class NumberBondState extends State<NumberBondWidget> {
           checkAnswer();
         });
       },
-      onLeave: (number) {
+      onLeave: (object) {
         if (!interactable) return;
         if (numbers.length == 0) return;
+        DraggableNumberInfo number = object as DraggableNumberInfo;
         var i = number.index;
         if (i == null) return;
         var value = number.value;

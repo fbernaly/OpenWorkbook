@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 
 import 'package:audioplayers/audio_cache.dart';
 
+import 'package:flutter_app/draggable/number.dart';
 import 'package:flutter_app/draggable/operation.dart';
 
 import 'package:flutter_app/math_operation.dart';
@@ -93,8 +94,9 @@ class AdditionState extends State<AdditionWidget> {
           checkAnswer();
         });
       },
-      onLeave: (number) {
+      onLeave: (object) {
         if (numbers.length == 0) return;
+        DraggableNumberInfo number = object as DraggableNumberInfo;
         var i = number.index;
         if (i == null) return;
         var value = number.value;
