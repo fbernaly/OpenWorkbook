@@ -1,22 +1,31 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import 'package:audioplayers/audio_cache.dart';
-
-import 'package:flutter_app/draggable/number.dart';
-
-import 'package:flutter_app/math_operation.dart';
+import 'package:flutter_app/utils/audio_player.dart';
+import 'package:flutter_app/widgets/number.dart';
+import 'package:flutter_app/utils/math_operation.dart';
 
 class AdditionWidget extends StatefulWidget {
   int a;
   int b;
+  bool clear;
   MathOperation operation;
   void Function() onOk;
+  void Function() onReview;
+  void Function() onError;
 
-  AdditionWidget({this.a, this.b, this.operation, this.onOk});
+  AdditionWidget(
+      {this.a,
+      this.b,
+      this.clear,
+      this.operation,
+      this.onOk,
+      this.onReview,
+      this.onError});
 
   createState() => AdditionState();
 }
@@ -24,36 +33,47 @@ class AdditionWidget extends StatefulWidget {
 class AdditionState extends State<AdditionWidget> {
   List<DraggableNumberInfo> numbers = [];
   final int _maxDigits = 3;
-  AudioCache _plyr = AudioCache();
+  AudioPlayer _plyr = AudioPlayer();
   Timer t;
 
   @override
   Widget build(BuildContext context) {
     var style = TextStyle(color: Colors.black, fontSize: 30);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
       children: <Widget>[
-        Text(
-          "${widget.a}",
-          style: style,
+        SizedBox(height: Platform.isIOS ? 60 : 10),
+        Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: DraggableNumber.getNumbers(onTapNumber)),
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                "${widget.a}",
+                style: style,
+              ),
+              SizedBox(width: 8),
+              Text(
+                _getOperationStr(),
+                style: style,
+              ),
+              SizedBox(width: 8),
+              Text(
+                '${widget.b}',
+                style: style,
+              ),
+              SizedBox(width: 8),
+              Text(
+                '=',
+                style: style,
+              ),
+              SizedBox(width: 8),
+              _buildDragTarget(),
+            ],
+          ),
         ),
-        SizedBox(width: 8),
-        Text(
-          _getOperationStr(),
-          style: style,
-        ),
-        SizedBox(width: 8),
-        Text(
-          '${widget.b}',
-          style: style,
-        ),
-        SizedBox(width: 8),
-        Text(
-          '=',
-          style: style,
-        ),
-        SizedBox(width: 8),
-        _buildDragTarget(),
       ],
     );
   }
@@ -65,6 +85,11 @@ class AdditionState extends State<AdditionWidget> {
   }
 
   Widget _buildDragTarget() {
+    if (widget.clear) {
+      numbers = [];
+      t?.cancel();
+      widget.clear = false;
+    }
     return DragTarget<DraggableNumberInfo>(
       builder: (BuildContext context, List<DraggableNumberInfo> incoming,
           List rejected) {
@@ -78,7 +103,10 @@ class AdditionState extends State<AdditionWidget> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: numbers.map((number) {
               number.index = i++;
-              return DraggableNumber(number: number);
+              return DraggableNumber(
+                number: number,
+                onTap: (number) => onTapNumber(number),
+              );
             }).toList(),
           );
         }
@@ -94,11 +122,11 @@ class AdditionState extends State<AdditionWidget> {
       },
       onWillAccept: (number) {
         if (number.index != null) {
-          _plyr.play('uhOhBaby.mp3');
+          _plyr.playRemoveSound();
           return false;
         }
         var accept = numbers.length + 1 <= _maxDigits;
-        if (!accept) _plyr.play('error.mp3');
+        if (!accept) _plyr.playErrorSound();
         return accept;
       },
       onAccept: (number) {
@@ -125,6 +153,15 @@ class AdditionState extends State<AdditionWidget> {
     );
   }
 
+  void onTapNumber(DraggableNumberInfo number) {
+    setState(() {
+      if (number.index == null && numbers.length + 1 <= _maxDigits)
+        numbers.add(number);
+      else if (number.index != null) numbers.removeAt(number.index);
+      checkAnswer();
+    });
+  }
+
   void checkAnswer() {
     t?.cancel();
     if (numbers.length == 0) return;
@@ -143,19 +180,19 @@ class AdditionState extends State<AdditionWidget> {
     print(
         "Checking answer: ${widget.a} $symbol ${widget.b} ${correct ? "=" : "/="} $answer");
     if (correct) {
-      print("answer is correct!!");
-      _plyr.play('success.mp3');
-      Future.delayed(const Duration(milliseconds: 1000), () {
-        setState(() {
-          numbers = [];
-          if (widget.onOk != null) widget.onOk();
-        });
+      Future.delayed(const Duration(milliseconds: 250), () {
+        print("answer is correct!!");
+        widget?.onOk();
+        numbers = [];
+        _plyr.playSuccessSound();
       });
     } else {
-      t = Timer(Duration(seconds: 5), () {
-        _plyr.play("error.mp3");
-        setState(() {
+      t = Timer(Duration(milliseconds: 1500), () {
+        widget?.onReview();
+        t = Timer(Duration(milliseconds: 3500), () {
+          widget?.onError();
           numbers = [];
+          _plyr.playErrorSound();
         });
       });
     }

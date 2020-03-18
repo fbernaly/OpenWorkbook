@@ -15,11 +15,12 @@ class DraggableNumberInfo {
 }
 
 class DraggableNumber extends StatelessWidget {
-  DraggableNumber({Key key, this.number}) : super(key: key);
-
+  final void Function(DraggableNumberInfo) onTap;
   final DraggableNumberInfo number;
 
-  static List<DraggableNumber> getNumbers() {
+  DraggableNumber({Key key, this.number, this.onTap}) : super(key: key);
+
+  static List<DraggableNumber> getNumbers(Function(DraggableNumberInfo) onTap) {
     /// Choices for game
     final List<int> numbers = [
       0,
@@ -35,7 +36,7 @@ class DraggableNumber extends StatelessWidget {
     ];
     return numbers.map((value) {
       var number = DraggableNumberInfo(value: value);
-      return DraggableNumber(number: number);
+      return DraggableNumber(number: number, onTap: onTap);
     }).toList();
   }
 
@@ -50,21 +51,25 @@ class DraggableNumber extends StatelessWidget {
   }
 
   Widget _buildDraggableWidget() {
-    return Container(
-      margin: EdgeInsets.all(1.0),
-      decoration: BoxDecoration(
-        color: Colors.purple.withAlpha(35),
-        border: Border.all(color: Colors.purple.withAlpha(85), width: 3.0),
-        borderRadius: BorderRadius.all(Radius.circular(5.0)),
-      ),
-      child: Center(
-        child: Text(
-          "${number.value}",
-          style: TextStyle(color: Colors.black, fontSize: 30),
-        ),
-      ),
-      height: 40,
-      width: 40,
-    );
+    return GestureDetector(
+        onTap: () {
+          if (onTap != null) onTap(number);
+        },
+        child: Container(
+          margin: EdgeInsets.all(1.0),
+          decoration: BoxDecoration(
+            color: Colors.purple.withAlpha(35),
+            border: Border.all(color: Colors.purple.withAlpha(85), width: 3.0),
+            borderRadius: BorderRadius.all(Radius.circular(5.0)),
+          ),
+          child: Center(
+            child: Text(
+              "${number.value}",
+              style: TextStyle(color: Colors.black, fontSize: 30),
+            ),
+          ),
+          height: 40,
+          width: 40,
+        ));
   }
 }

@@ -1,49 +1,76 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import 'package:audioplayers/audio_cache.dart';
-
-import 'package:flutter_app/draggable/number.dart';
+import 'package:flutter_app/widgets/number.dart';
+import 'package:flutter_app/utils/audio_player.dart';
 
 class NumberBondWidget extends StatefulWidget {
   int a;
   int b;
   int c;
+  bool clear;
   void Function() onOk;
+  void Function() onReview;
+  void Function() onError;
 
-  NumberBondWidget({this.a, this.b, this.c, this.onOk});
+  NumberBondWidget(
+      {this.a,
+      this.b,
+      this.c,
+      this.clear,
+      this.onOk,
+      this.onReview,
+      this.onError});
 
   createState() => NumberBondState();
 }
 
 class NumberBondState extends State<NumberBondWidget> {
-  Widget _widgetA, _widgetB, _widgetC;
   List<DraggableNumberInfo> _numbersA = [], _numbersB = [], _numbersC = [];
-  final int _maxDigits = 3;
-  AudioCache _plyr = AudioCache();
-  Timer _t;
+  final int _maxDigits = 2;
+  AudioPlayer _plyr = AudioPlayer();
+  Timer t;
 
   @override
   Widget build(BuildContext context) {
     double radius = 45;
+    if (widget.clear) {
+      t?.cancel();
+      widget.clear = false;
+      if (widget.a == null) _numbersA = [];
+      if (widget.b == null) _numbersB = [];
+      if (widget.c == null) _numbersC = [];
+    }
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        _widgetC = _buildDragTarget(
-            radius: radius, value: widget.c, numbers: _numbersC),
-        Text('/              \\'),
+        SizedBox(height: Platform.isIOS ? 60 : 10),
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            _widgetA = _buildDragTarget(
-                radius: radius, value: widget.a, numbers: _numbersA),
-            SizedBox(width: 20),
-            _widgetB = _buildDragTarget(
-                radius: radius, value: widget.b, numbers: _numbersB),
-          ],
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: DraggableNumber.getNumbers(onTapNumber)),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              _buildDragTarget(
+                  radius: radius, value: widget.c, numbers: _numbersC),
+              Text('/              \\'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  _buildDragTarget(
+                      radius: radius, value: widget.a, numbers: _numbersA),
+                  SizedBox(width: 20),
+                  _buildDragTarget(
+                      radius: radius, value: widget.b, numbers: _numbersB),
+                ],
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -68,7 +95,10 @@ class NumberBondState extends State<NumberBondWidget> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: numbers.map((number) {
                 number.index = i++;
-                return DraggableNumber(number: number);
+                return DraggableNumber(
+                  number: number,
+                  onTap: (number) => onTapNumber(number),
+                );
               }).toList(),
             );
           }
@@ -93,11 +123,11 @@ class NumberBondState extends State<NumberBondWidget> {
       onWillAccept: (number) {
         if (!interactable) return false;
         if (number.index != null) {
-          _plyr.play('uhOhBaby.mp3');
+          _plyr.playRemoveSound();
           return false;
         }
         var accept = numbers.length + 1 <= _maxDigits;
-        if (!accept) _plyr.play('error.mp3');
+        if (!accept) _plyr.playErrorSound();
         return accept;
       },
       onAccept: (number) {
@@ -139,8 +169,40 @@ class NumberBondState extends State<NumberBondWidget> {
     return v;
   }
 
+  void onTapNumber(DraggableNumberInfo number) {
+    print("number: ${number.value}");
+
+    setState(() {
+      if (number.index != null) {
+        var i = _numbersA.indexOf(number);
+        if (i >= 0) _numbersA.removeAt(i);
+
+        i = _numbersB.indexOf(number);
+        if (i >= 0) _numbersB.removeAt(i);
+
+        i = _numbersC.indexOf(number);
+        if (i >= 0) _numbersC.removeAt(i);
+      } else {
+        if (widget.a == null && widget.b != null && widget.c != null) {
+          if (_numbersA.length + 1 <= _maxDigits) {
+            _numbersA.add(number);
+          }
+        } else if (widget.a != null && widget.b == null && widget.c != null) {
+          if (_numbersB.length + 1 <= _maxDigits) {
+            _numbersB.add(number);
+          }
+        } else if (widget.a != null && widget.b != null && widget.c == null) {
+          if (_numbersC.length + 1 <= _maxDigits) {
+            _numbersC.add(number);
+          }
+        }
+      }
+      checkAnswer();
+    });
+  }
+
   void checkAnswer() {
-    _t?.cancel();
+    t?.cancel();
     var a = getValue(widget.a, _numbersA);
     var b = getValue(widget.b, _numbersB);
     var c = getValue(widget.c, _numbersC);
@@ -148,23 +210,23 @@ class NumberBondState extends State<NumberBondWidget> {
     print(
         "Checking answer: ${widget.a} + ${widget.b} ${correct ? "=" : "/="} $c");
     if (correct) {
-      print("answer is correct!!");
-      _plyr.play('success.mp3');
-      Future.delayed(const Duration(milliseconds: 1000), () {
-        setState(() {
-          _numbersA = [];
-          _numbersB = [];
-          _numbersC = [];
-          if (widget.onOk != null) widget.onOk();
-        });
+      Future.delayed(const Duration(milliseconds: 250), () {
+        print("answer is correct!!");
+        widget?.onOk();
+        _numbersA = [];
+        _numbersB = [];
+        _numbersC = [];
+        _plyr.playSuccessSound();
       });
     } else {
-      _t = Timer(Duration(seconds: 5), () {
-        _plyr.play("error.mp3");
-        setState(() {
+      t = Timer(Duration(milliseconds: 1500), () {
+        widget?.onReview();
+        t = Timer(Duration(milliseconds: 3500), () {
+          widget?.onError();
           _numbersA = [];
           _numbersB = [];
           _numbersC = [];
+          _plyr.playErrorSound();
         });
       });
     }

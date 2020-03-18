@@ -1,12 +1,17 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+
 import 'dart:io' show Platform;
+import 'dart:async';
 
 import 'package:flutter_app/addition/addition_page.dart';
 import 'package:flutter_app/number_bond/number_bond_page.dart';
 import 'package:flutter_app/comparison/comparison_page.dart';
-import 'package:flutter_app/force_orientation.dart';
+import 'package:flutter_app/utils/force_orientation.dart';
+import 'package:flutter_app/utils/random.dart';
+import 'package:flutter_app/widgets/robot.dart';
 
 class Home extends StatefulWidget {
   Home() : super();
@@ -20,6 +25,8 @@ class Home extends StatefulWidget {
 class HomeState extends State<Home> {
   CarouselSlider carouselSlider;
   int _current = 0;
+  String message;
+  Timer timer;
   List imgList = [
     'addition-and-subtraction-signs.png',
     'less-than-greater-than-signs.png',
@@ -41,39 +48,68 @@ class HomeState extends State<Home> {
       appBar: PlatformAppBar(
         title: Text(widget.title),
       ),
-      body: Container(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            SizedBox(height: Platform.isIOS ? 60 : 10),
-            Expanded(
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                child: carouselSlider = _getCarouselSlider(),
+      body: Stack(
+        children: <Widget>[
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(height: Platform.isIOS ? 60 : 10),
+              Expanded(
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  child: carouselSlider = _getCarouselSlider(),
+                ),
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: map<Widget>(imgList, (index, url) {
-                return Container(
-                  width: 10.0,
-                  height: 10.0,
-                  margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _current == index
-                        ? Colors.purple
-                        : Colors.purple.withAlpha(100),
-                  ),
-                );
-              }),
-            ),
-            SizedBox(height: Platform.isIOS ? 10 : 0),
-          ],
-        ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: map<Widget>(imgList, (index, url) {
+                  return Container(
+                    width: 10.0,
+                    height: 10.0,
+                    margin:
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _current == index
+                          ? Colors.purple
+                          : Colors.purple.withAlpha(100),
+                    ),
+                  );
+                }),
+              ),
+              SizedBox(height: Platform.isIOS ? 10 : 0),
+            ],
+          ),
+          RobotWidget(
+            message: message,
+            onTap: () => _showMessage(),
+          ),
+        ],
       ),
     );
+  }
+
+  void _showMessage() {
+    setState(() {
+      var message = this.message;
+      do {
+        message = RandomGenerator.getRandomGreetingMessage();
+      } while (this.message == message);
+      this.message = message;
+    });
+    _startHideMessageTimer();
+  }
+
+  void _startHideMessageTimer() {
+    timer?.cancel();
+    if (message != null) {
+      timer = Timer(Duration(seconds: 3), () {
+        setState(() {
+          message = null;
+        });
+      });
+    }
   }
 
   CarouselSlider _getCarouselSlider() {
@@ -94,7 +130,8 @@ class HomeState extends State<Home> {
         });
       },
       items: imgList.map((imgName) {
-        return InkWell(
+        return Material(
+            child: InkWell(
           onTap: () {
             int i = imgList.indexOf(imgName);
             _pushPage(i);
@@ -109,7 +146,7 @@ class HomeState extends State<Home> {
               ),
             ),
           ),
-        );
+        ));
       }).toList(),
     );
   }

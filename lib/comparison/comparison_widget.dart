@@ -1,56 +1,80 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import 'package:audioplayers/audio_cache.dart';
+import 'package:flutter_app/utils/audio_player.dart';
+import 'package:flutter_app/widgets/operation.dart';
+import 'package:flutter_app/utils/math_operation.dart';
 
-import 'package:flutter_app/draggable/number.dart';
-import 'package:flutter_app/draggable/operation.dart';
-
-import 'package:flutter_app/math_operation.dart';
-
-class AdditionWidget extends StatefulWidget {
+class ComparisonWidget extends StatefulWidget {
   int a;
   int b;
+  bool clear;
   MathOperation operation;
   void Function() onOk;
+  void Function() onReview;
+  void Function() onError;
 
-  AdditionWidget({this.a, this.b, this.operation, this.onOk});
+  ComparisonWidget(
+      {this.a,
+      this.b,
+      this.clear,
+      this.operation,
+      this.onOk,
+      this.onReview,
+      this.onError});
 
-  createState() => AdditionState();
+  createState() => ComparisonState();
 }
 
-class AdditionState extends State<AdditionWidget> {
+class ComparisonState extends State<ComparisonWidget> {
   List<DraggableOperationsInfo> numbers = [];
   final int _maxDigits = 1;
-  AudioCache _plyr = AudioCache();
+  AudioPlayer _plyr = AudioPlayer();
   Timer t;
 
   @override
   Widget build(BuildContext context) {
     var style = TextStyle(color: Colors.black, fontSize: 30);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
       children: <Widget>[
-        Text(
-          "${widget.a}",
-          style: style,
+        SizedBox(height: Platform.isIOS ? 60 : 10),
+        Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: DraggableOperation.getOperations(onTapNumber)),
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                "${widget.a}",
+                style: style,
+              ),
+              SizedBox(width: 8),
+              _buildDragTarget(),
+              SizedBox(width: 8),
+              Text(
+                '${widget.b}',
+                style: style,
+              ),
+              SizedBox(width: 8),
+            ],
+          ),
         ),
-        SizedBox(width: 8),
-        _buildDragTarget(),
-        SizedBox(width: 8),
-        Text(
-          '${widget.b}',
-          style: style,
-        ),
-        SizedBox(width: 8),
       ],
     );
   }
 
   Widget _buildDragTarget() {
+    if (widget.clear) {
+      numbers = [];
+      t?.cancel();
+      widget.clear = false;
+    }
     return DragTarget<DraggableOperationsInfo>(
       builder: (BuildContext context, List<DraggableOperationsInfo> incoming,
           List rejected) {
@@ -64,7 +88,8 @@ class AdditionState extends State<AdditionWidget> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: numbers.map((number) {
               number.index = i++;
-              return DraggableOperation(number: number);
+              return DraggableOperation(
+                  number: number, onTap: (number) => onTapNumber(number));
             }).toList(),
           );
         }
@@ -80,11 +105,11 @@ class AdditionState extends State<AdditionWidget> {
       },
       onWillAccept: (number) {
         if (number.index != null) {
-          _plyr.play('uhOhBaby.mp3');
+          _plyr.playRemoveSound();
           return false;
         }
         var accept = numbers.length + 1 <= _maxDigits;
-        if (!accept) _plyr.play('error.mp3');
+        if (!accept) _plyr.playErrorSound();
         return accept;
       },
       onAccept: (number) {
@@ -96,7 +121,7 @@ class AdditionState extends State<AdditionWidget> {
       },
       onLeave: (object) {
         if (numbers.length == 0) return;
-        DraggableNumberInfo number = object as DraggableNumberInfo;
+        DraggableOperationsInfo number = object as DraggableOperationsInfo;
         var i = number.index;
         if (i == null) return;
         var value = number.value;
@@ -109,6 +134,15 @@ class AdditionState extends State<AdditionWidget> {
         });
       },
     );
+  }
+
+  void onTapNumber(DraggableOperationsInfo number) {
+    setState(() {
+      if (number.index == null && numbers.length + 1 <= _maxDigits)
+        numbers.add(number);
+      else if (number.index != null) numbers.removeAt(number.index);
+      checkAnswer();
+    });
   }
 
   void checkAnswer() {
@@ -128,18 +162,19 @@ class AdditionState extends State<AdditionWidget> {
     print(
         "Checking answer: ${widget.a} $symbol ${widget.b} is ${correct ? "correct" : "incorrect"} ");
     if (correct) {
-      _plyr.play('success.mp3');
-      Future.delayed(const Duration(milliseconds: 1000), () {
-        setState(() {
-          numbers = [];
-          if (widget.onOk != null) widget.onOk();
-        });
+      Future.delayed(const Duration(milliseconds: 250), () {
+        print("answer is correct!!");
+        widget?.onOk();
+        numbers = [];
+        _plyr.playSuccessSound();
       });
     } else {
-      t = Timer(Duration(milliseconds: 500), () {
-        _plyr.play("error.mp3");
-        setState(() {
+      t = Timer(Duration(milliseconds: 1500), () {
+        widget?.onReview();
+        t = Timer(Duration(milliseconds: 3500), () {
+          widget?.onError();
           numbers = [];
+          _plyr.playErrorSound();
         });
       });
     }

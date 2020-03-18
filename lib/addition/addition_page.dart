@@ -1,19 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-
-import 'package:audioplayers/audio_cache.dart';
-
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-import 'dart:io' show Platform;
+import 'dart:async';
 
 import 'package:flutter_app/addition/addition_widget.dart';
 import 'package:flutter_app/addition/config_addition_page.dart';
-import 'package:flutter_app/draggable/number.dart';
-import 'package:flutter_app/math_operation.dart';
-import 'package:flutter_app/force_orientation.dart';
-import 'package:flutter_app/random.dart';
+import 'package:flutter_app/widgets/dojo_state.dart';
+import 'package:flutter_app/widgets/robot.dart';
+import 'package:flutter_app/utils/math_operation.dart';
+import 'package:flutter_app/utils/force_orientation.dart';
+import 'package:flutter_app/utils/random.dart';
+import 'package:flutter_app/utils/audio_player.dart';
 
 class AdditionSubtractionPage extends StatefulWidget {
   String title = "Addition/Subtraction Dojo";
@@ -25,7 +24,12 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
   int a, b;
   MathOperation operation;
   ConfigAddition config = ConfigAddition();
-  AudioCache _plyr = AudioCache();
+  AudioPlayer _plyr = AudioPlayer();
+  bool showWelcomeMessage = true;
+  String message;
+  Timer timer;
+  DojoPageState state = DojoPageState.welcome;
+  bool clear = false;
 
   @override
   initState() {
@@ -42,68 +46,149 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
         title: Text(widget.title),
         trailingActions: <Widget>[
           IconButton(
-            icon: Icon(Icons.edit),
-            onPressed: () => _config(),
+            icon: Icon(Icons.settings),
+            onPressed: () => _showConfig(),
           ),
         ],
       ),
-      body: Stack(
-        children: <Widget>[
-          Column(
-            children: <Widget>[
-              SizedBox(height: Platform.isIOS ? 60 : 10),
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: DraggableNumber.getNumbers()),
-              Expanded(
-                child: AdditionWidget(
-                  a: a,
-                  b: b,
-                  operation: operation,
-                  onOk: () => _onOk(),
-                ),
-              ),
-            ],
-          ),
-          Positioned(
-            right: 16.0,
-            bottom: 16.0,
-            child: PlatformIconButton(
-                onPressed: () => _reload(),
-                iosIcon: Icon(
-                  CupertinoIcons.refresh,
-                  size: 35.0,
-                ),
-                androidIcon: Icon(Icons.refresh, size: 35.0)),
-          )
-        ],
-      ),
+      body: _getBody(),
     );
   }
 
-  void _config() {
-    WidgetBuilder pageToDisplayBuilder = (_) => ConfigAdditionPage(config);
-    Navigator.push(
-      context,
-      platformPageRoute(
-        context: context,
-        builder: pageToDisplayBuilder,
-      ),
+  Widget _getBody() {
+    switch (state) {
+      case DojoPageState.welcome:
+        return _getConfigWidget();
+
+      case DojoPageState.configuration:
+        return _getConfigWidget();
+
+      case DojoPageState.working:
+        return _getMainBodyWidget();
+    }
+  }
+
+  Widget _getConfigWidget() {
+    message == null;
+    if (showWelcomeMessage) {
+      message = "Select what you want to practice";
+      showWelcomeMessage = false;
+    }
+    String title, buttonText;
+    switch (state) {
+      case DojoPageState.welcome:
+        title = "Welcome";
+        buttonText = "START";
+        break;
+
+      case DojoPageState.configuration:
+        title = "Options";
+        buttonText = "OK";
+        break;
+    }
+    _startHideMessageTimer();
+    return ConfigAdditionPage(
+      title: title,
+      robotMessage: message,
+      buttonText: buttonText,
+      config: config,
+      onRobotTap: () {
+        setState(() {
+          showWelcomeMessage = true;
+        });
+      },
+      onConfigChange: (config) {
+        setState(() {
+          this.config = config;
+        });
+      },
+      onOk: () => _startWorking(),
     );
   }
 
-  void _onOk() {
+  Widget _getMainBodyWidget() {
+    var clear = this.clear;
+    this.clear = false;
+    return Stack(
+      children: <Widget>[
+        AdditionWidget(
+          a: a,
+          b: b,
+          clear: clear,
+          operation: operation,
+          onOk: () => _onCorrectAnswer(),
+          onReview: () => _onReviewAnswer(),
+          onError: () => _onIncorrectAnswer(),
+        ),
+        RobotWidget(
+          message: message,
+          onTap: () {
+            _showMessage("Drag the numbers to enter your answer.");
+          },
+        ),
+        Positioned(
+          right: 16.0,
+          bottom: 16.0,
+          child: PlatformButton(
+              onPressed: () => _skipProblem(),
+              child: PlatformText('SKIP'),
+              android: (_) => MaterialRaisedButtonData(
+                  color: Colors.purple, textColor: Colors.white)),
+        ),
+      ],
+    );
+  }
+
+  void _showMessage(String message) {
     setState(() {
-      _setOperation();
+      this.message = message;
+    });
+    _startHideMessageTimer();
+  }
+
+  void _startHideMessageTimer() {
+    timer?.cancel();
+    if (message != null) {
+      timer = Timer(Duration(seconds: 2), () {
+        setState(() {
+          message = null;
+        });
+      });
+    }
+  }
+
+  void _startWorking() {
+    setState(() {
+      message = null;
+      state = DojoPageState.working;
+    });
+    _setOperation();
+  }
+
+  void _showConfig() {
+    setState(() {
+      message = null;
+      state = DojoPageState.configuration;
     });
   }
 
-  void _reload() {
-    _plyr.play('swoosh.mp3');
-    setState(() {
-      _setOperation();
-    });
+  void _onCorrectAnswer() {
+    _showMessage(RandomGenerator.getRandomOkMessage());
+    _setOperation();
+  }
+
+  void _onReviewAnswer() {
+    _showMessage(RandomGenerator.getRandomReviewMessage());
+  }
+
+  void _onIncorrectAnswer() {
+    _showMessage(RandomGenerator.getRandomErrorMessage());
+  }
+
+  void _skipProblem() {
+    _plyr.playSkipSound();
+    _showMessage(RandomGenerator.getRandomSkipMessage());
+    _setOperation();
   }
 
   void _setOperation() {
@@ -128,7 +213,6 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
           min: config.minA,
           max: config.maxA);
     } while (this.a == a);
-    this.a = a;
     var b = this.b;
     do {
       b = RandomGenerator.generate(
@@ -136,7 +220,6 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
           min: config.minB,
           max: config.maxB);
     } while (this.b == b);
-    this.b = b;
     String symbol = operation == MathOperation.addition
         ? "+"
         : (operation == MathOperation.subtraction ? "-" : "");
@@ -146,5 +229,10 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
           "operations with negative result are not allowed, setting a new one...");
       _setOperation();
     }
+    setState(() {
+      this.a = a;
+      this.b = b;
+      this.clear = true;
+    });
   }
 }

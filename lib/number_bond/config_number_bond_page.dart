@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter/services.dart';
-
-import 'dart:io' show Platform;
 
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-import 'package:flutter_app/force_orientation.dart';
+import 'package:flutter_app/widgets/robot.dart';
 
 class ConfigNumberBond {
   int min = 10, max = 20;
@@ -18,79 +15,106 @@ class ConfigNumberBond {
   }
 }
 
-class ConfigNumberBondPage extends StatefulWidget {
+class ConfigNumberBondPage extends StatelessWidget {
+  String title;
+  String robotMessage;
+  String buttonText;
   ConfigNumberBond config;
+  void Function() onRobotTap;
+  void Function() onOk;
+  void Function(ConfigNumberBond) onConfigChange;
+  final int max = 100;
 
-  ConfigNumberBondPage(this.config);
-
-  createState() => ConfigNumberBondPageState();
-}
-
-class ConfigNumberBondPageState extends State<ConfigNumberBondPage> {
-  TextEditingController textControlllerMin;
-  TextEditingController textControlllerMax;
-
-  @override
-  initState() {
-    super.initState();
-
-    textControlllerMin = TextEditingController(text: "${widget.config.min}");
-    textControlllerMax = TextEditingController(text: "${widget.config.max}");
-  }
-
-  @override
-  void dispose() {
-    // update config
-    widget.config.min = int.parse(textControlllerMin.text);
-    widget.config.max = int.parse(textControlllerMax.text);
-
-    // Clean up the controller when the widget is disposed.
-    textControlllerMin.dispose();
-    textControlllerMax.dispose();
-    super.dispose();
-  }
+  ConfigNumberBondPage(
+      {Key key,
+      this.title,
+      this.robotMessage,
+      this.buttonText,
+      this.config,
+      this.onRobotTap,
+      this.onConfigChange,
+      this.onOk})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    ForceOrientation.setPortrait(context);
-    var textStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0);
-    return PlatformScaffold(
-      appBar: PlatformAppBar(
-        title: Text('Configure Number Bond Dojo'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(height: Platform.isIOS ? 100 : 0),
-            Text('Number bond', style: textStyle),
-            Row(
-              children: <Widget>[
-                SizedBox(width: 20),
-                Text('Min:'),
-                SizedBox(width: 8),
-                Flexible(
-                  child: PlatformTextField(
-                    keyboardType: TextInputType.number,
-                    controller: textControlllerMin,
-                  ),
-                ),
-                SizedBox(width: 20),
-                Text('Max:'),
-                SizedBox(width: 8),
-                Flexible(
-                  child: PlatformTextField(
-                    keyboardType: TextInputType.number,
-                    controller: textControlllerMax,
-                  ),
-                ),
-              ],
-            ),
-          ],
+    var textStyle =
+        TextStyle(color: Colors.purple, fontWeight: FontWeight.bold);
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+          color: Colors.purple.withAlpha(85),
+          width: 2,
         ),
+        borderRadius: BorderRadius.all(Radius.circular(15.0)),
+        boxShadow: [
+          BoxShadow(blurRadius: 5, color: Colors.purple, offset: Offset(1, 2))
+        ],
       ),
+      child: Stack(
+        children: <Widget>[
+          Column(
+            children: <Widget>[
+              SizedBox(height: 10),
+              Text(
+                title,
+                style: TextStyle(
+                  color: Colors.purple,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 120),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      "Numbers from ${config.min} to ${config.max}",
+                      style: textStyle,
+                    ),
+                    RangeSlider(
+                      min: 0,
+                      max: max.toDouble(),
+                      divisions: max,
+                      values: RangeValues(
+                          config.min.toDouble(), config.max.toDouble()),
+                      labels: RangeLabels(
+                          config.min.toString(), config.max.toString()),
+                      onChanged: (values) {
+                        config.min = values.start.toInt();
+                        config.max = values.end.toInt();
+                        if (config.min == max) config.min = max - 1;
+                        if (config.max - config.min <= 0) {
+                          config.max = config.min + 1;
+                        }
+                        onConfigChange(config);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          RobotWidget(
+            message: robotMessage,
+            size: RobotSize.small,
+            onTap: () => this.onRobotTap(),
+          ),
+          Positioned(
+            right: 8.0,
+            bottom: 4.0,
+            child: PlatformButton(
+                onPressed: () => onOk(),
+                child: PlatformText(buttonText),
+                android: (_) => MaterialRaisedButtonData(
+                    color: Colors.purple, textColor: Colors.white)),
+          ),
+        ],
+      ), //Your child widget
     );
   }
 }
