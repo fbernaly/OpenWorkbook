@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:flutter_app/number_bond/number_bond_widget.dart';
 import 'package:flutter_app/number_bond/config_number_bond_page.dart';
@@ -43,10 +44,13 @@ class NumberBondState extends State<NumberBondPage> {
       appBar: PlatformAppBar(
         title: Text(widget.title),
         trailingActions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () => _showConfig(),
-          ),
+          Material(
+              color: Colors.purple,
+              child: IconButton(
+                color: Colors.white,
+                icon: Icon(Icons.settings),
+                onPressed: () => _showConfig(),
+              )),
         ],
       ),
       body: _getBody(),
@@ -121,17 +125,20 @@ class NumberBondState extends State<NumberBondPage> {
         RobotWidget(
           message: message,
           onTap: () {
-            _showMessage("Drag the numbers to enter your answer.");
+            _showMessage("Drag or tap the numbers to enter your answer.");
           },
         ),
         Positioned(
-          right: 16.0,
-          bottom: 16.0,
+          right: Platform.isIOS ? 16 : 8,
+          bottom: Platform.isIOS ? 16 : 4,
           child: PlatformButton(
               onPressed: () => _skipProblem(),
               child: PlatformText('SKIP'),
               android: (_) => MaterialRaisedButtonData(
-                  color: Colors.purple, textColor: Colors.white)),
+                  color: Colors.purple, textColor: Colors.white),
+              ios: (_) => CupertinoButtonData(
+                    color: Colors.purple,
+                  )),
         ),
       ],
     );

@@ -131,22 +131,23 @@ class HomeState extends State<Home> {
       },
       items: imgList.map((imgName) {
         return Material(
+            color: Colors.white,
             child: InkWell(
-          onTap: () {
-            int i = imgList.indexOf(imgName);
-            _pushPage(i);
-          },
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            margin: EdgeInsets.all(10.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.all(Radius.circular(5.0)),
-              child: Image(
-                image: AssetImage(imgName),
+              onTap: () {
+                int i = imgList.indexOf(imgName);
+                _pushPage(i);
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                margin: EdgeInsets.all(10.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                  child: Image(
+                    image: AssetImage(imgName),
+                  ),
+                ),
               ),
-            ),
-          ),
-        ));
+            ));
       }).toList(),
     );
   }

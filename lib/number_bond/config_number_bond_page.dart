@@ -5,6 +5,8 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import 'package:flutter_app/widgets/robot.dart';
 
+import 'dart:io' show Platform;
+
 class ConfigNumberBond {
   int min = 10, max = 20;
 
@@ -41,7 +43,11 @@ class ConfigNumberBondPage extends StatelessWidget {
     var textStyle =
         TextStyle(color: Colors.purple, fontWeight: FontWeight.bold);
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+      margin: EdgeInsets.only(
+          left: Platform.isIOS ? 60 : 20,
+          right: Platform.isIOS ? 60 : 20,
+          top: 20,
+          bottom: 20),
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -58,7 +64,7 @@ class ConfigNumberBondPage extends StatelessWidget {
         children: <Widget>[
           Column(
             children: <Widget>[
-              SizedBox(height: 10),
+              SizedBox(height: 20),
               Text(
                 title,
                 style: TextStyle(
@@ -67,6 +73,7 @@ class ConfigNumberBondPage extends StatelessWidget {
                   fontSize: 20,
                 ),
               ),
+              SizedBox(height: 20),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 120),
                 child: Column(
@@ -76,24 +83,28 @@ class ConfigNumberBondPage extends StatelessWidget {
                       "Numbers from ${config.min} to ${config.max}",
                       style: textStyle,
                     ),
-                    RangeSlider(
-                      min: 0,
-                      max: max.toDouble(),
-                      divisions: max,
-                      values: RangeValues(
-                          config.min.toDouble(), config.max.toDouble()),
-                      labels: RangeLabels(
-                          config.min.toString(), config.max.toString()),
-                      onChanged: (values) {
-                        config.min = values.start.toInt();
-                        config.max = values.end.toInt();
-                        if (config.min == max) config.min = max - 1;
-                        if (config.max - config.min <= 0) {
-                          config.max = config.min + 1;
-                        }
-                        onConfigChange(config);
-                      },
-                    ),
+                    Material(
+                        color: Colors.white,
+                        child: RangeSlider(
+                          min: 0,
+                          max: max.toDouble(),
+                          divisions: max,
+                          activeColor: Colors.purple,
+                          inactiveColor: Colors.purple.withAlpha(50),
+                          values: RangeValues(
+                              config.min.toDouble(), config.max.toDouble()),
+                          labels: RangeLabels(
+                              config.min.toString(), config.max.toString()),
+                          onChanged: (values) {
+                            config.min = values.start.toInt();
+                            config.max = values.end.toInt();
+                            if (config.min == max) config.min = max - 1;
+                            if (config.max - config.min <= 0) {
+                              config.max = config.min + 1;
+                            }
+                            onConfigChange(config);
+                          },
+                        )),
                   ],
                 ),
               ),
@@ -105,13 +116,16 @@ class ConfigNumberBondPage extends StatelessWidget {
             onTap: () => this.onRobotTap(),
           ),
           Positioned(
-            right: 8.0,
-            bottom: 4.0,
+            right: Platform.isIOS ? 16 : 8,
+            bottom: Platform.isIOS ? 16 : 4,
             child: PlatformButton(
                 onPressed: () => onOk(),
                 child: PlatformText(buttonText),
                 android: (_) => MaterialRaisedButtonData(
-                    color: Colors.purple, textColor: Colors.white)),
+                    color: Colors.purple, textColor: Colors.white),
+                ios: (_) => CupertinoButtonData(
+                      color: Colors.purple,
+                    )),
           ),
         ],
       ), //Your child widget

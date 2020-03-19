@@ -23,20 +23,25 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
-    final themeData = new ThemeData(
+    final themeData = ThemeData(
       primarySwatch: Colors.purple,
     );
 
-    final cupertinoTheme = new CupertinoThemeData(
+    final cupertinoTheme = CupertinoThemeData(
       primaryColor: Colors.purple,
+      barBackgroundColor: Colors.purple,
+      scaffoldBackgroundColor: Colors.white,
+      textTheme: CupertinoTextThemeData(
+        primaryColor: Colors.white,
+      ),
     );
 
     return PlatformProvider(
       builder: (BuildContext context) => PlatformApp(
         title: 'Flutter Platform Widgets',
-        android: (_) => new MaterialAppData(
+        android: (_) => MaterialAppData(
             theme: themeData, debugShowCheckedModeBanner: false),
-        ios: (_) => new CupertinoAppData(
+        ios: (_) => CupertinoAppData(
             theme: cupertinoTheme, debugShowCheckedModeBanner: false),
         home: Home(),
       ),

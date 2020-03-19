@@ -1,4 +1,3 @@
-
 enum MathOperation {
   addition,
   subtraction,

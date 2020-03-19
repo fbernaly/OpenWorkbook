@@ -6,6 +6,8 @@ import 'package:flutter_app/widgets/message_label.dart';
 
 import 'package:lottie/lottie.dart';
 
+import 'dart:io' show Platform;
+
 enum RobotSize { large, small }
 
 class RobotWidget extends StatelessWidget {
@@ -19,10 +21,10 @@ class RobotWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     double width = 100;
     double height = 150;
-    double left = -40;
-    double bottom = -10;
+    double left = Platform.isIOS ? 0 : -40;
+    double bottom = Platform.isIOS ? 0 : -10;
     double mLeft = 40;
-    double mTop = 80;
+    double mTop = Platform.isIOS ? 60 : 80;
 
     switch (size) {
       case RobotSize.small:

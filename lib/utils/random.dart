@@ -7,9 +7,7 @@ class RandomGenerator {
 
   static String getRandomItem(List<String> items) {
     var i = RandomGenerator.generate(
-        seed: DateTime.now().millisecondsSinceEpoch,
-        min: 0,
-        max: items.length);
+        seed: DateTime.now().millisecondsSinceEpoch, min: 0, max: items.length);
     return items[i];
   }
 
@@ -35,10 +33,7 @@ class RandomGenerator {
   }
 
   static String getRandomReviewMessage() {
-    List<String> messages = [
-      'Are you sure?',
-      'Review your answer'
-    ];
+    List<String> messages = ['Are you sure?', 'Review your answer'];
     return getRandomItem(messages);
   }
 
