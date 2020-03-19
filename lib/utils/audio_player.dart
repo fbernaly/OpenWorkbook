@@ -12,10 +12,10 @@ class AudioPlayer {
   }
 
   void playRemoveSound() {
-    _plyr.play('uhOhBaby.mp3');
+    _plyr.play('error.mp3');
   }
 
   void playErrorSound() {
-    _plyr.play('error.mp3');
+    _plyr.play('uhOhBaby.mp3');
   }
 }
