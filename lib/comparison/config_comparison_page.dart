@@ -1,21 +1,12 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import 'package:flutter_app/widgets/robot.dart';
-
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-import 'dart:io' show Platform;
-
-class ConfigComparison {
-  int min = 10, max = 20;
-
-  @override
-  String toString() {
-    return """
-    min: $min, max: $max""";
-  }
-}
+import 'package:flutter_app/widgets/robot.dart';
+import 'package:flutter_app/configuration/config_comparison.dart';
 
 class ConfigComparisonPage extends StatelessWidget {
   String title;

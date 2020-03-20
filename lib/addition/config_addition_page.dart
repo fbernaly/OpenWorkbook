@@ -1,27 +1,15 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/cupertino.dart';
 
+import 'package:grouped_buttons/grouped_buttons.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+
 import 'package:flutter_app/widgets/robot.dart';
 import 'package:flutter_app/utils/math_operation.dart';
-
-import 'dart:io' show Platform;
-
-import 'package:grouped_buttons/grouped_buttons.dart';
-
-class ConfigAddition {
-  int minA = 10, minB = 2, maxA = 20, maxB = 9;
-  List<MathOperation> operations = [MathOperation.addition];
-
-  @override
-  String toString() {
-    return """
-    minA: $minA, maxA: $maxA
-    minB: $minB, maxB: $maxB
-    operations: $operations""";
-  }
-}
+import 'package:flutter_app/configuration/config_addition.dart';
 
 class ConfigAdditionPage extends StatelessWidget {
   String title;

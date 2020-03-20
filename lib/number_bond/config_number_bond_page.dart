@@ -1,21 +1,12 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import 'package:flutter_app/widgets/robot.dart';
-
-import 'dart:io' show Platform;
-
-class ConfigNumberBond {
-  int min = 10, max = 20;
-
-  @override
-  String toString() {
-    return """
-    min: $min, max: $max""";
-  }
-}
+import 'package:flutter_app/configuration/config_number_bond.dart';
 
 class ConfigNumberBondPage extends StatelessWidget {
   String title;

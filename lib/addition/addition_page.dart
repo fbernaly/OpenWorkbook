@@ -1,10 +1,11 @@
+import 'dart:async';
+import 'dart:io' show Platform;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
-import 'dart:async';
-import 'dart:io' show Platform;
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import 'package:flutter_app/addition/addition_widget.dart';
 import 'package:flutter_app/addition/config_addition_page.dart';
@@ -14,6 +15,7 @@ import 'package:flutter_app/utils/math_operation.dart';
 import 'package:flutter_app/utils/force_orientation.dart';
 import 'package:flutter_app/utils/random.dart';
 import 'package:flutter_app/utils/audio_player.dart';
+import 'package:flutter_app/configuration/config_addition.dart';
 
 class AdditionSubtractionPage extends StatefulWidget {
   String title = "Addition/Subtraction Dojo";
@@ -31,13 +33,6 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
   Timer timer;
   DojoPageState state = DojoPageState.welcome;
   bool clear = false;
-
-  @override
-  initState() {
-    super.initState();
-
-    _setOperation();
-  }
 
   @override
   Widget build(BuildContext context) {

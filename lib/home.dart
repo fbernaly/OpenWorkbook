@@ -1,10 +1,11 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-
 import 'dart:io' show Platform;
 import 'dart:async';
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import 'package:flutter_app/addition/addition_page.dart';
 import 'package:flutter_app/number_bond/number_bond_page.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_app/comparison/comparison_page.dart';
 import 'package:flutter_app/utils/force_orientation.dart';
 import 'package:flutter_app/utils/random.dart';
 import 'package:flutter_app/widgets/robot.dart';
+import 'package:flutter_app/configuration/configuration.dart';
 
 class Home extends StatefulWidget {
   Home() : super();
@@ -39,6 +41,13 @@ class HomeState extends State<Home> {
       result.add(handler(i, list[i]));
     }
     return result;
+  }
+
+  @override
+  initState() {
+    super.initState();
+
+    Configuration.start();
   }
 
   @override

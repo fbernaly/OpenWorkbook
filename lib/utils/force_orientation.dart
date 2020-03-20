@@ -1,7 +1,7 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
-
-import 'dart:io' show Platform;
 
 class ForceOrientation {
   static const _rotationChannel =
