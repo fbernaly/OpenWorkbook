@@ -13,7 +13,7 @@ PODS:
 
 DEPENDENCIES:
   - audioplayers (from `.symlinks/plugins/audioplayers/ios`)
-  - Flutter (from `.symlinks/flutter/ios`)
+  - Flutter (from `Flutter`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
   - shared_preferences_macos (from `.symlinks/plugins/shared_preferences_macos/ios`)
@@ -23,7 +23,7 @@ EXTERNAL SOURCES:
   audioplayers:
     :path: ".symlinks/plugins/audioplayers/ios"
   Flutter:
-    :path: ".symlinks/flutter/ios"
+    :path: Flutter
   path_provider:
     :path: ".symlinks/plugins/path_provider/ios"
   shared_preferences:
@@ -41,6 +41,6 @@ SPEC CHECKSUMS:
   shared_preferences_macos: f3f29b71ccbb56bf40c9dd6396c9acf15e214087
   shared_preferences_web: 141cce0c3ed1a1c5bf2a0e44f52d31eeb66e5ea9
 
-PODFILE CHECKSUM: 10ae9c18d12c9ffc2275c9a159a3b1e281990db0
+PODFILE CHECKSUM: c34e2287a9ccaa606aeceab922830efb9a6ff69a
 
 COCOAPODS: 1.8.4
