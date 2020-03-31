@@ -23,7 +23,7 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
-    final themeData = ThemeData(
+    final androidTheme = ThemeData(
       primarySwatch: Colors.purple,
     );
 
@@ -40,7 +40,7 @@ class _AppState extends State<App> {
       builder: (BuildContext context) => PlatformApp(
         title: 'Flutter Platform Widgets',
         android: (_) => MaterialAppData(
-            theme: themeData, debugShowCheckedModeBanner: false),
+            theme: androidTheme, debugShowCheckedModeBanner: false),
         ios: (_) => CupertinoAppData(
             theme: cupertinoTheme, debugShowCheckedModeBanner: false),
         home: Home(),

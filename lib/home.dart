@@ -34,6 +34,7 @@ class HomeState extends State<Home> {
     'less-than-greater-than-signs.png',
     'number_bonds.png'
   ];
+  List titles = ['Additions & subtractions', 'Comparisons', 'Number bonds'];
 
   List<T> map<T>(List list, Function handler) {
     List<T> result = [];
@@ -48,6 +49,10 @@ class HomeState extends State<Home> {
     super.initState();
 
     Configuration.start();
+
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      _showMessage("Welcome, ready to practice?");
+    });
   }
 
   @override
@@ -60,10 +65,8 @@ class HomeState extends State<Home> {
       body: Stack(
         children: <Widget>[
           Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              SizedBox(height: Platform.isIOS ? 60 : 10),
+              SizedBox(height: 10),
               Expanded(
                 child: Container(
                   width: MediaQuery.of(context).size.width,
@@ -92,19 +95,23 @@ class HomeState extends State<Home> {
           ),
           RobotWidget(
             message: message,
-            onTap: () => _showMessage(),
+            onTap: () => _showMessage(_getGreetingMessage()),
           ),
         ],
       ),
     );
   }
 
-  void _showMessage() {
+  String _getGreetingMessage() {
+    var message = this.message;
+    do {
+      message = RandomGenerator.getRandomGreetingMessage();
+    } while (this.message == message);
+    return message;
+  }
+
+  void _showMessage(String message) {
     setState(() {
-      var message = this.message;
-      do {
-        message = RandomGenerator.getRandomGreetingMessage();
-      } while (this.message == message);
       this.message = message;
     });
     _startHideMessageTimer();
@@ -131,7 +138,7 @@ class HomeState extends State<Home> {
       enableInfiniteScroll: true,
       autoPlayInterval: Duration(seconds: 2),
       autoPlayAnimationDuration: Duration(milliseconds: 2000),
-      pauseAutoPlayOnTouch: Duration(seconds: 3),
+      pauseAutoPlayOnTouch: Duration(seconds: 5),
       scrollDirection: Axis.horizontal,
       onPageChanged: (index) {
         setState(() {
@@ -146,15 +153,26 @@ class HomeState extends State<Home> {
                 int i = imgList.indexOf(imgName);
                 _pushPage(i);
               },
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                margin: EdgeInsets.all(10.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                  child: Image(
-                    image: AssetImage(imgName),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    titles[imgList.indexOf(imgName)],
+                    style: TextStyle(
+                        color: Colors.purple,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 25),
                   ),
-                ),
+                  Container(
+                    height: MediaQuery.of(context).size.height - 150,
+                    padding: EdgeInsets.all(20.0),
+                    child: Image(
+                      fit: BoxFit.fill,
+                      image: AssetImage(imgName),
+                    ),
+                  ),
+                ],
               ),
             ));
       }).toList(),

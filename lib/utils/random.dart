@@ -15,7 +15,9 @@ class RandomGenerator {
     List<String> messages = [
       'Hello, how are you?',
       'Ready to practice?',
-      'What are we going to practice?'
+      'What are we going to practice?',
+      'I am here to help you!',
+      'Select what to practice'
     ];
     return getRandomItem(messages);
   }
