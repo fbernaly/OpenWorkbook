@@ -100,18 +100,6 @@ class ComparisonState extends State<ComparisonPage> {
       message = "Select what you want to practice";
       showWelcomeMessage = false;
     }
-    String title, buttonText;
-    switch (state) {
-      case DojoPageState.welcome:
-        title = "Welcome";
-        buttonText = "START";
-        break;
-
-      case DojoPageState.configuration:
-        title = "Options";
-        buttonText = "OK";
-        break;
-    }
     _startHideMessageTimer();
     return ConfigComparisonPage(
       robotMessage: message,
@@ -159,7 +147,7 @@ class ComparisonState extends State<ComparisonPage> {
         RobotWidget(
           message: message,
           onTap: () {
-            _showMessage("Drag or tap the symbols to enter your answer.");
+            _showMessage("Drag or tap the symbols to enter your answer");
           },
         ),
       ],
@@ -177,9 +165,11 @@ class ComparisonState extends State<ComparisonPage> {
     timer?.cancel();
     if (message != null) {
       timer = Timer(Duration(seconds: 4), () {
-        setState(() {
-          message = null;
-        });
+        if (this.mounted) {
+          setState(() {
+            message = null;
+          });
+        }
       });
     }
   }
@@ -194,7 +184,7 @@ class ComparisonState extends State<ComparisonPage> {
 
   void _showConfig() {
     setState(() {
-      message = null;
+      showWelcomeMessage = true;
       state = DojoPageState.configuration;
     });
   }

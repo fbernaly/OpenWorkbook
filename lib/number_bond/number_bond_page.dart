@@ -7,6 +7,8 @@ import 'package:flutter/widgets.dart';
 
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
+import 'package:tuple/tuple.dart';
+
 import 'package:flutter_app/number_bond/number_bond_widget.dart';
 import 'package:flutter_app/number_bond/config_number_bond_page.dart';
 import 'package:flutter_app/utils/force_orientation.dart';
@@ -15,6 +17,7 @@ import 'package:flutter_app/utils/audio_player.dart';
 import 'package:flutter_app/widgets/dojo_state.dart';
 import 'package:flutter_app/widgets/robot.dart';
 import 'package:flutter_app/configuration/config_number_bond.dart';
+import 'package:flutter_app/widgets/tutorial_page.dart';
 
 class NumberBondPage extends StatefulWidget {
   String title = "Number Bond Dojo";
@@ -43,7 +46,7 @@ class NumberBondState extends State<NumberBondPage> {
               color: Colors.purple,
               child: IconButton(
                 color: Colors.white,
-                icon: Icon(Icons.settings),
+                icon: Icon(Icons.tune),
                 onPressed: () => _showConfig(),
               )),
         ],
@@ -55,7 +58,7 @@ class NumberBondState extends State<NumberBondPage> {
   Widget _getBody() {
     switch (state) {
       case DojoPageState.welcome:
-        return _getConfigWidget();
+        return _getWelcomeWidget();
 
       case DojoPageState.configuration:
         return _getConfigWidget();
@@ -65,6 +68,32 @@ class NumberBondState extends State<NumberBondPage> {
     }
   }
 
+  Widget _getWelcomeWidget() {
+    message == null;
+    if (showWelcomeMessage) {
+      message = "This is how you play!";
+      showWelcomeMessage = false;
+    }
+    _startHideMessageTimer();
+    List<Tuple2<String, String>> pages = [
+      Tuple2('tutorial_drag_numbers_bond.png',
+          'Drag or tap the numbers to enter your answer'),
+      Tuple2('tutorial_options.png', 'Tap this icon to change your options'),
+      Tuple2('tutorial_skip.png', 'Tap this button to skip problems'),
+      Tuple2('tutorial_back.png', 'Tap back when you are done practicing')
+    ];
+    return TutorialPage(
+      pages: pages,
+      robotMessage: message,
+      onRobotTap: () {
+        setState(() {
+          showWelcomeMessage = true;
+        });
+      },
+      onOk: () => _startWorking(),
+    );
+  }
+
   Widget _getConfigWidget() {
     message == null;
     if (showWelcomeMessage) {
@@ -72,22 +101,9 @@ class NumberBondState extends State<NumberBondPage> {
       showWelcomeMessage = false;
     }
     String title, buttonText;
-    switch (state) {
-      case DojoPageState.welcome:
-        title = "Welcome";
-        buttonText = "START";
-        break;
-
-      case DojoPageState.configuration:
-        title = "Options";
-        buttonText = "OK";
-        break;
-    }
     _startHideMessageTimer();
     return ConfigNumberBondPage(
-      title: title,
       robotMessage: message,
-      buttonText: buttonText,
       config: config,
       onRobotTap: () {
         setState(() {
@@ -99,6 +115,7 @@ class NumberBondState extends State<NumberBondPage> {
           this.config = config;
         });
       },
+      onTutorialTap: () => _showTutorial(),
       onOk: () => _startWorking(),
     );
   }
@@ -117,23 +134,23 @@ class NumberBondState extends State<NumberBondPage> {
           onReview: () => _onReviewAnswer(),
           onError: () => _onIncorrectAnswer(),
         ),
-        RobotWidget(
-          message: message,
-          onTap: () {
-            _showMessage("Drag or tap the numbers to enter your answer.");
-          },
-        ),
         Positioned(
           right: Platform.isIOS ? 16 : 8,
           bottom: Platform.isIOS ? 16 : 4,
           child: PlatformButton(
               onPressed: () => _skipProblem(),
-              child: PlatformText('SKIP'),
+              child: PlatformText('Skip'),
               android: (_) => MaterialRaisedButtonData(
                   color: Colors.purple, textColor: Colors.white),
               ios: (_) => CupertinoButtonData(
                     color: Colors.purple,
                   )),
+        ),
+        RobotWidget(
+          message: message,
+          onTap: () {
+            _showMessage("Drag or tap the numbers to enter your answer");
+          },
         ),
       ],
     );
@@ -149,10 +166,12 @@ class NumberBondState extends State<NumberBondPage> {
   void _startHideMessageTimer() {
     timer?.cancel();
     if (message != null) {
-      timer = Timer(Duration(seconds: 2), () {
-        setState(() {
-          message = null;
-        });
+      timer = Timer(Duration(seconds: 4), () {
+        if (this.mounted) {
+          setState(() {
+            message = null;
+          });
+        }
       });
     }
   }
@@ -167,14 +186,23 @@ class NumberBondState extends State<NumberBondPage> {
 
   void _showConfig() {
     setState(() {
-      message = null;
+      showWelcomeMessage = true;
       state = DojoPageState.configuration;
+    });
+  }
+
+  void _showTutorial() {
+    setState(() {
+      showWelcomeMessage = true;
+      state = DojoPageState.welcome;
     });
   }
 
   void _onCorrectAnswer() {
     _showMessage(RandomGenerator.getRandomOkMessage());
-    _setOperation();
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      _setOperation();
+    });
   }
 
   void _onReviewAnswer() {
@@ -194,24 +222,20 @@ class NumberBondState extends State<NumberBondPage> {
   void _setOperation() {
     if (config.max - config.min <= 1) return;
     print("config:\n$config");
-    var c = this.c;
-    do {
-      c = RandomGenerator.generate(
-          seed: DateTime.now().millisecondsSinceEpoch,
-          min: config.min,
-          max: config.max);
-    } while (this.c == c);
-    this.c = c;
+    this.c = RandomGenerator.generate(
+        seed: DateTime.now().millisecondsSinceEpoch,
+        min: config.min,
+        max: config.max,
+        initial: this.c);
 
     if (c == 0) {
       this.a = 0;
     } else {
-      var a = this.a;
-      do {
-        a = RandomGenerator.generate(
-            seed: DateTime.now().millisecondsSinceEpoch + 1, min: 0, max: c);
-      } while (this.a == a);
-      this.a = a;
+      this.a = RandomGenerator.generate(
+          seed: DateTime.now().millisecondsSinceEpoch + 1,
+          min: 0,
+          max: c,
+          initial: this.a);
     }
 
     this.b = c - a;

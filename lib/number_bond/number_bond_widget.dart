@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io' show Platform;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -45,32 +44,38 @@ class NumberBondState extends State<NumberBondWidget> {
       if (widget.b == null) _numbersB = [];
       if (widget.c == null) _numbersC = [];
     }
-    return Column(
+    return Stack(
       children: <Widget>[
-        SizedBox(height: Platform.isIOS ? 60 : 10),
-        Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: DraggableNumber.getNumbers(onTapNumber)),
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              _buildDragTarget(
-                  radius: radius, value: widget.c, numbers: _numbersC),
-              Text('/              \\'),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  _buildDragTarget(
-                      radius: radius, value: widget.a, numbers: _numbersA),
-                  SizedBox(width: 20),
-                  _buildDragTarget(
-                      radius: radius, value: widget.b, numbers: _numbersB),
-                ],
-              ),
-            ],
-          ),
+        Column(
+          children: <Widget>[
+            SizedBox(height: 10),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 30),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: DraggableNumber.getNumbers(onTapNumber)),
+            ),
+          ],
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            _buildDragTarget(
+                radius: radius, value: widget.c, numbers: _numbersC),
+            Text('/              \\'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                _buildDragTarget(
+                    radius: radius, value: widget.a, numbers: _numbersA),
+                SizedBox(width: 20),
+                _buildDragTarget(
+                    radius: radius, value: widget.b, numbers: _numbersB),
+              ],
+            ),
+          ],
         ),
       ],
     );
@@ -170,8 +175,6 @@ class NumberBondState extends State<NumberBondWidget> {
   }
 
   void onTapNumber(DraggableNumberInfo number) {
-    print("number: ${number.value}");
-
     setState(() {
       if (number.index != null) {
         var i = _numbersA.indexOf(number);
@@ -213,9 +216,6 @@ class NumberBondState extends State<NumberBondWidget> {
       Future.delayed(const Duration(milliseconds: 250), () {
         print("answer is correct!!");
         widget?.onOk();
-        _numbersA = [];
-        _numbersB = [];
-        _numbersC = [];
         _plyr.playSuccessSound();
       });
     } else {

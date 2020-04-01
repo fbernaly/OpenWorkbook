@@ -158,7 +158,7 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
         RobotWidget(
           message: message,
           onTap: () {
-            _showMessage("Drag or tap the numbers to enter your answer.");
+            _showMessage("Drag or tap the numbers to enter your answer");
           },
         ),
       ],
@@ -176,9 +176,11 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
     timer?.cancel();
     if (message != null) {
       timer = Timer(Duration(seconds: 4), () {
-        setState(() {
-          message = null;
-        });
+        if (this.mounted) {
+          setState(() {
+            message = null;
+          });
+        }
       });
     }
   }
