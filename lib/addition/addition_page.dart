@@ -83,7 +83,7 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
     _startHideMessageTimer();
     List<Tuple2<String, String>> pages = [
       Tuple2('tutorial_drag_numbers_addition.png',
-          'Drag or tap to numbers to enter your answer.'),
+          'Drag or tap the numbers to enter your answer'),
       Tuple2('tutorial_options.png', 'Tap this icon to change your options'),
       Tuple2('tutorial_skip.png', 'Tap this button to skip problems'),
       Tuple2('tutorial_back.png', 'Tap back when you are done practicing')

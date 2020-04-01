@@ -18,7 +18,7 @@ class ConfigAdditionPage extends StatelessWidget {
   void Function() onOk;
   void Function() onTutorialTap;
   void Function(ConfigAddition) onConfigChange;
-  final int max = 50;
+  final int max = 100;
 
   ConfigAdditionPage(
       {Key key,

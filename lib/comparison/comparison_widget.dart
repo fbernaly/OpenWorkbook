@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io' show Platform;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -39,31 +38,42 @@ class ComparisonState extends State<ComparisonWidget> {
   @override
   Widget build(BuildContext context) {
     var style = TextStyle(color: Colors.black, fontSize: 30);
-    return Column(
+    return Stack(
       children: <Widget>[
-        SizedBox(height: Platform.isIOS ? 60 : 10),
-        Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: DraggableOperation.getOperations(onTapNumber)),
-        Expanded(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                "${widget.a}",
-                style: style,
-              ),
-              SizedBox(width: 8),
-              _buildDragTarget(),
-              SizedBox(width: 8),
-              Text(
-                '${widget.b}',
-                style: style,
-              ),
-              SizedBox(width: 8),
-            ],
-          ),
+        Column(
+          children: <Widget>[
+            SizedBox(height: 10),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 30),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: DraggableOperation.getOperations(onTapNumber)),
+            ),
+          ],
+        ),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  "${widget.a}",
+                  style: style,
+                ),
+                SizedBox(width: 8),
+                _buildDragTarget(),
+                SizedBox(width: 8),
+                Text(
+                  '${widget.b}',
+                  style: style,
+                ),
+                SizedBox(width: 8),
+              ],
+            ),
+          ],
         ),
       ],
     );
@@ -165,7 +175,6 @@ class ComparisonState extends State<ComparisonWidget> {
       Future.delayed(const Duration(milliseconds: 250), () {
         print("answer is correct!!");
         widget?.onOk();
-        numbers = [];
         _plyr.playSuccessSound();
       });
     } else {

@@ -9,23 +9,21 @@ import 'package:flutter_app/widgets/robot.dart';
 import 'package:flutter_app/configuration/config_comparison.dart';
 
 class ConfigComparisonPage extends StatelessWidget {
-  String title;
   String robotMessage;
-  String buttonText;
   ConfigComparison config;
   void Function() onRobotTap;
   void Function() onOk;
+  void Function() onTutorialTap;
   void Function(ConfigComparison) onConfigChange;
   final int max = 100;
 
   ConfigComparisonPage(
       {Key key,
-      this.title,
       this.robotMessage,
-      this.buttonText,
       this.config,
       this.onRobotTap,
       this.onConfigChange,
+      this.onTutorialTap,
       this.onOk})
       : super(key: key);
 
@@ -55,18 +53,18 @@ class ConfigComparisonPage extends StatelessWidget {
         children: <Widget>[
           Column(
             children: <Widget>[
-              SizedBox(height: 20),
+              SizedBox(height: 16),
               Text(
-                title,
+                "Options",
                 style: TextStyle(
                   color: Colors.purple,
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 16),
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 120),
+                margin: EdgeInsets.symmetric(horizontal: 80),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -101,22 +99,36 @@ class ConfigComparisonPage extends StatelessWidget {
               ),
             ],
           ),
+          Positioned(
+            right: Platform.isIOS ? 16 : 8,
+            bottom: Platform.isIOS ? 16 : 4,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                PlatformButton(
+                    onPressed: () => onTutorialTap(),
+                    child: PlatformText("Tutorial"),
+                    android: (_) => MaterialRaisedButtonData(
+                        color: Colors.purple, textColor: Colors.white),
+                    ios: (_) => CupertinoButtonData(
+                          color: Colors.purple,
+                        )),
+                SizedBox(width: 8), // give it width
+                PlatformButton(
+                    onPressed: () => onOk(),
+                    child: PlatformText("Ok"),
+                    android: (_) => MaterialRaisedButtonData(
+                        color: Colors.purple, textColor: Colors.white),
+                    ios: (_) => CupertinoButtonData(
+                          color: Colors.purple,
+                        )),
+              ],
+            ),
+          ),
           RobotWidget(
             message: robotMessage,
             size: RobotSize.small,
             onTap: () => this.onRobotTap(),
-          ),
-          Positioned(
-            right: Platform.isIOS ? 16 : 8,
-            bottom: Platform.isIOS ? 16 : 4,
-            child: PlatformButton(
-                onPressed: () => onOk(),
-                child: PlatformText(buttonText),
-                android: (_) => MaterialRaisedButtonData(
-                    color: Colors.purple, textColor: Colors.white),
-                ios: (_) => CupertinoButtonData(
-                      color: Colors.purple,
-                    )),
           ),
         ],
       ), //Your child widget
