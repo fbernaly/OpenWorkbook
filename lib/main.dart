@@ -38,7 +38,6 @@ class _AppState extends State<App> {
 
     return PlatformProvider(
       builder: (BuildContext context) => PlatformApp(
-        title: 'Flutter Platform Widgets',
         android: (_) => MaterialAppData(
             theme: androidTheme, debugShowCheckedModeBanner: false),
         ios: (_) => CupertinoAppData(

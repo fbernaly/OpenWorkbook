@@ -1,11 +1,11 @@
-import 'dart:io' show Platform;
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+
+import 'package:tuple/tuple.dart';
 
 import 'package:flutter_app/addition/addition_page.dart';
 import 'package:flutter_app/number_bond/number_bond_page.dart';
@@ -14,6 +14,7 @@ import 'package:flutter_app/utils/force_orientation.dart';
 import 'package:flutter_app/utils/random.dart';
 import 'package:flutter_app/widgets/robot.dart';
 import 'package:flutter_app/configuration/configuration.dart';
+import 'package:flutter_app/widgets/carousel.dart';
 
 class Home extends StatefulWidget {
   Home() : super();
@@ -25,24 +26,8 @@ class Home extends StatefulWidget {
 }
 
 class HomeState extends State<Home> {
-  CarouselSlider carouselSlider;
-  int _current = 0;
   String message;
   Timer timer;
-  List imgList = [
-    'addition-and-subtraction-signs.png',
-    'less-than-greater-than-signs.png',
-    'number_bonds.png'
-  ];
-  List titles = ['Additions & subtractions', 'Comparisons', 'Number bonds'];
-
-  List<T> map<T>(List list, Function handler) {
-    List<T> result = [];
-    for (var i = 0; i < list.length; i++) {
-      result.add(handler(i, list[i]));
-    }
-    return result;
-  }
 
   @override
   initState() {
@@ -66,31 +51,9 @@ class HomeState extends State<Home> {
         children: <Widget>[
           Column(
             children: <Widget>[
-              SizedBox(height: 10),
-              Expanded(
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  child: carouselSlider = _getCarouselSlider(),
-                ),
+              Carousel(
+                items: _getCarouselItems(context),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: map<Widget>(imgList, (index, url) {
-                  return Container(
-                    width: 10.0,
-                    height: 10.0,
-                    margin:
-                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _current == index
-                          ? Colors.purple
-                          : Colors.purple.withAlpha(100),
-                    ),
-                  );
-                }),
-              ),
-              SizedBox(height: Platform.isIOS ? 10 : 0),
             ],
           ),
           RobotWidget(
@@ -100,6 +63,46 @@ class HomeState extends State<Home> {
         ],
       ),
     );
+  }
+
+  List<Widget> _getCarouselItems(BuildContext context) {
+    List<Tuple2<String, String>> items = [
+      Tuple2('addition-and-subtraction-signs.png', 'Additions & subtractions'),
+      Tuple2('less-than-greater-than-signs.png', 'Comparisons'),
+      Tuple2('number_bonds.png', 'Number bonds')
+    ];
+    return items.map((item) {
+      int index = items.indexOf(item);
+      return Material(
+          color: Colors.white,
+          child: InkWell(
+            onTap: () {
+              _pushPage(index);
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  items[index].item2,
+                  style: TextStyle(
+                      color: Colors.purple,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 25),
+                ),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.all(10.0),
+                    child: Image(
+                      fit: BoxFit.fill,
+                      image: AssetImage(items[index].item1),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ));
+    }).toList();
   }
 
   String _getGreetingMessage() {
@@ -128,60 +131,7 @@ class HomeState extends State<Home> {
     }
   }
 
-  CarouselSlider _getCarouselSlider() {
-    return CarouselSlider(
-      viewportFraction: 0.7,
-      aspectRatio: 1.0,
-      enlargeCenterPage: true,
-      autoPlay: true,
-      reverse: false,
-      enableInfiniteScroll: true,
-      autoPlayInterval: Duration(seconds: 2),
-      autoPlayAnimationDuration: Duration(milliseconds: 2000),
-      pauseAutoPlayOnTouch: Duration(seconds: 5),
-      scrollDirection: Axis.horizontal,
-      onPageChanged: (index) {
-        setState(() {
-          _current = index;
-        });
-      },
-      items: imgList.map((imgName) {
-        return Material(
-            color: Colors.white,
-            child: InkWell(
-              onTap: () {
-                int i = imgList.indexOf(imgName);
-                _pushPage(i);
-              },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    titles[imgList.indexOf(imgName)],
-                    style: TextStyle(
-                        color: Colors.purple,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 25),
-                  ),
-                  Container(
-                    height: MediaQuery.of(context).size.height - 150,
-                    padding: EdgeInsets.all(20.0),
-                    child: Image(
-                      fit: BoxFit.fill,
-                      image: AssetImage(imgName),
-                    ),
-                  ),
-                ],
-              ),
-            ));
-      }).toList(),
-    );
-  }
-
   void _pushPage(int index) {
-    print("Push page $index");
-    if (_current != index) carouselSlider.jumpToPage(index);
     if (index == 0) _showAdditionPage();
     if (index == 1) _showComparisonPage();
     if (index == 2) _showNumberBondPage();
