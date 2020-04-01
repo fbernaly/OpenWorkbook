@@ -17,7 +17,8 @@ class TutorialPage extends StatelessWidget {
   void Function() onRobotTap;
   void Function() onOk;
 
-  TutorialPage({Key key, this.pages, this.robotMessage, this.onRobotTap, this.onOk})
+  TutorialPage(
+      {Key key, this.pages, this.robotMessage, this.onRobotTap, this.onOk})
       : super(key: key);
 
   @override
@@ -60,11 +61,6 @@ class TutorialPage extends StatelessWidget {
               ),
             ],
           ),
-          RobotWidget(
-            message: robotMessage,
-            size: RobotSize.small,
-            onTap: () => this.onRobotTap(),
-          ),
           Positioned(
             right: Platform.isIOS ? 16 : 8,
             bottom: Platform.isIOS ? 16 : 4,
@@ -76,6 +72,11 @@ class TutorialPage extends StatelessWidget {
                 ios: (_) => CupertinoButtonData(
                       color: Colors.purple,
                     )),
+          ),
+          RobotWidget(
+            message: robotMessage,
+            size: RobotSize.small,
+            onTap: () => this.onRobotTap(),
           ),
         ],
       ), //Your child widget

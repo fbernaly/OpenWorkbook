@@ -123,7 +123,7 @@ class HomeState extends State<Home> {
   void _startHideMessageTimer() {
     timer?.cancel();
     if (message != null) {
-      timer = Timer(Duration(seconds: 3), () {
+      timer = Timer(Duration(seconds: 4), () {
         setState(() {
           message = null;
         });

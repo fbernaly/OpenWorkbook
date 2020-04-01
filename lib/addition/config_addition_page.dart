@@ -12,23 +12,21 @@ import 'package:flutter_app/utils/math_operation.dart';
 import 'package:flutter_app/configuration/config_addition.dart';
 
 class ConfigAdditionPage extends StatelessWidget {
-  String title;
   String robotMessage;
-  String buttonText;
   ConfigAddition config;
   void Function() onRobotTap;
   void Function() onOk;
+  void Function() onTutorialTap;
   void Function(ConfigAddition) onConfigChange;
   final int max = 50;
 
   ConfigAdditionPage(
       {Key key,
-      this.title,
       this.robotMessage,
-      this.buttonText,
       this.config,
       this.onRobotTap,
       this.onConfigChange,
+      this.onTutorialTap,
       this.onOk})
       : super(key: key);
 
@@ -58,18 +56,17 @@ class ConfigAdditionPage extends StatelessWidget {
         children: <Widget>[
           Column(
             children: <Widget>[
-              SizedBox(height: 20),
+              SizedBox(height: 16),
               Text(
-                title,
+                "Options",
                 style: TextStyle(
                   color: Colors.purple,
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
                 ),
               ),
-              SizedBox(height: Platform.isIOS ? 10 : 0),
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 120),
+                margin: EdgeInsets.symmetric(horizontal: 80),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -79,7 +76,6 @@ class ConfigAdditionPage extends StatelessWidget {
                         _getOptions()
                       ],
                     ),
-                    SizedBox(height: Platform.isIOS ? 20 : 0),
                     Text(
                       "1st number from ${config.minA} to ${config.maxA}",
                       style: textStyle,
@@ -137,22 +133,36 @@ class ConfigAdditionPage extends StatelessWidget {
               ),
             ],
           ),
+          Positioned(
+            right: Platform.isIOS ? 16 : 8,
+            bottom: Platform.isIOS ? 16 : 4,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                PlatformButton(
+                    onPressed: () => onTutorialTap(),
+                    child: PlatformText("Tutorial"),
+                    android: (_) => MaterialRaisedButtonData(
+                        color: Colors.purple, textColor: Colors.white),
+                    ios: (_) => CupertinoButtonData(
+                          color: Colors.purple,
+                        )),
+                SizedBox(width: 8), // give it width
+                PlatformButton(
+                    onPressed: () => onOk(),
+                    child: PlatformText("Ok"),
+                    android: (_) => MaterialRaisedButtonData(
+                        color: Colors.purple, textColor: Colors.white),
+                    ios: (_) => CupertinoButtonData(
+                          color: Colors.purple,
+                        )),
+              ],
+            ),
+          ),
           RobotWidget(
             message: robotMessage,
             size: RobotSize.small,
             onTap: () => this.onRobotTap(),
-          ),
-          Positioned(
-            right: Platform.isIOS ? 16 : 8,
-            bottom: Platform.isIOS ? 16 : 4,
-            child: PlatformButton(
-                onPressed: () => onOk(),
-                child: PlatformText(buttonText),
-                android: (_) => MaterialRaisedButtonData(
-                    color: Colors.purple, textColor: Colors.white),
-                ios: (_) => CupertinoButtonData(
-                      color: Colors.purple,
-                    )),
           ),
         ],
       ), //Your child widget

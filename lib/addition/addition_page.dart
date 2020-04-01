@@ -7,6 +7,8 @@ import 'package:flutter/widgets.dart';
 
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
+import 'package:tuple/tuple.dart';
+
 import 'package:flutter_app/addition/addition_widget.dart';
 import 'package:flutter_app/addition/config_addition_page.dart';
 import 'package:flutter_app/widgets/dojo_state.dart';
@@ -16,6 +18,7 @@ import 'package:flutter_app/utils/force_orientation.dart';
 import 'package:flutter_app/utils/random.dart';
 import 'package:flutter_app/utils/audio_player.dart';
 import 'package:flutter_app/configuration/config_addition.dart';
+import 'package:flutter_app/widgets/tutorial_page.dart';
 
 class AdditionSubtractionPage extends StatefulWidget {
   String title = "Addition/Subtraction Dojo";
@@ -29,6 +32,7 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
   ConfigAddition config = ConfigAddition();
   AudioPlayer _plyr = AudioPlayer();
   bool showWelcomeMessage = true;
+  bool showErrorMessage = false;
   String message;
   Timer timer;
   DojoPageState state = DojoPageState.welcome;
@@ -45,7 +49,7 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
               color: Colors.purple,
               child: IconButton(
                 color: Colors.white,
-                icon: Icon(Icons.settings),
+                icon: Icon(Icons.tune),
                 onPressed: () => _showConfig(),
               )),
         ],
@@ -57,7 +61,7 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
   Widget _getBody() {
     switch (state) {
       case DojoPageState.welcome:
-        return _getConfigWidget();
+        return _getWelcomeWidget();
 
       case DojoPageState.configuration:
         return _getConfigWidget();
@@ -67,29 +71,48 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
     }
   }
 
+  Widget _getWelcomeWidget() {
+    message == null;
+    if (showWelcomeMessage) {
+      message = "This is how you play!";
+      showWelcomeMessage = false;
+    }
+    if (showErrorMessage) {
+      message = "Wrong settings, tap the Options icon to fix";
+    }
+    _startHideMessageTimer();
+    List<Tuple2<String, String>> pages = [
+      Tuple2('tutorial_drag_numbers_addition.png',
+          'Drag or tap to numbers to enter your answer.'),
+      Tuple2('tutorial_options.png', 'Tap this icon to change your options'),
+      Tuple2('tutorial_skip.png', 'Tap this button to skip problems'),
+      Tuple2('tutorial_back.png', 'Tap back when you are done practicing')
+    ];
+    return TutorialPage(
+      pages: pages,
+      robotMessage: message,
+      onRobotTap: () {
+        setState(() {
+          showWelcomeMessage = true;
+        });
+      },
+      onOk: () => _startWorking(),
+    );
+  }
+
   Widget _getConfigWidget() {
     message == null;
     if (showWelcomeMessage) {
       message = "Select what you want to practice";
       showWelcomeMessage = false;
     }
-    String title, buttonText;
-    switch (state) {
-      case DojoPageState.welcome:
-        title = "Welcome";
-        buttonText = "START";
-        break;
-
-      case DojoPageState.configuration:
-        title = "Options";
-        buttonText = "OK";
-        break;
+    if (showErrorMessage) {
+      message = "2nd number cannot be gratter than 1st number for subtraction";
+      showErrorMessage = false;
     }
     _startHideMessageTimer();
     return ConfigAdditionPage(
-      title: title,
       robotMessage: message,
-      buttonText: buttonText,
       config: config,
       onRobotTap: () {
         setState(() {
@@ -101,6 +124,7 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
           this.config = config;
         });
       },
+      onTutorialTap: () => _showTutorial(),
       onOk: () => _startWorking(),
     );
   }
@@ -119,23 +143,23 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
           onReview: () => _onReviewAnswer(),
           onError: () => _onIncorrectAnswer(),
         ),
-        RobotWidget(
-          message: message,
-          onTap: () {
-            _showMessage("Drag or tap the numbers to enter your answer.");
-          },
-        ),
         Positioned(
           right: Platform.isIOS ? 16 : 8,
           bottom: Platform.isIOS ? 16 : 4,
           child: PlatformButton(
               onPressed: () => _skipProblem(),
-              child: PlatformText('SKIP'),
+              child: PlatformText('Skip'),
               android: (_) => MaterialRaisedButtonData(
                   color: Colors.purple, textColor: Colors.white),
               ios: (_) => CupertinoButtonData(
                     color: Colors.purple,
                   )),
+        ),
+        RobotWidget(
+          message: message,
+          onTap: () {
+            _showMessage("Drag or tap the numbers to enter your answer.");
+          },
         ),
       ],
     );
@@ -151,7 +175,7 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
   void _startHideMessageTimer() {
     timer?.cancel();
     if (message != null) {
-      timer = Timer(Duration(seconds: 2), () {
+      timer = Timer(Duration(seconds: 4), () {
         setState(() {
           message = null;
         });
@@ -160,6 +184,14 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
   }
 
   void _startWorking() {
+    if (config.operations.length == 1 &&
+        config.operations.contains(MathOperation.subtraction) &&
+        (config.maxA <= config.minB || config.maxA < config.maxB)) {
+      setState(() {
+        showErrorMessage = true;
+      });
+      return;
+    }
     setState(() {
       message = null;
       state = DojoPageState.working;
@@ -169,14 +201,23 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
 
   void _showConfig() {
     setState(() {
-      message = null;
+      showWelcomeMessage = true;
       state = DojoPageState.configuration;
+    });
+  }
+
+  void _showTutorial() {
+    setState(() {
+      showWelcomeMessage = true;
+      state = DojoPageState.welcome;
     });
   }
 
   void _onCorrectAnswer() {
     _showMessage(RandomGenerator.getRandomOkMessage());
-    _setOperation();
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      _setOperation();
+    });
   }
 
   void _onReviewAnswer() {
@@ -195,6 +236,7 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
 
   void _setOperation() {
     print("config:\n$config");
+    operation = MathOperation.addition;
     if (config.operations.length == 1 &&
         config.operations.contains(MathOperation.addition)) {
       operation = MathOperation.addition;
@@ -205,26 +247,21 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
         config.operations.contains(MathOperation.addition) &&
         config.operations.contains(MathOperation.subtraction)) {
       int i = RandomGenerator.generate(
-          seed: DateTime.now().millisecondsSinceEpoch,
           min: 0,
-          max: config.operations.length);
-      print("i: ${i} ${config.operations.length}");
+          max: config.operations.length - 1,
+          seed: DateTime.now().millisecondsSinceEpoch);
       operation = config.operations[i];
     }
-    var a = this.a;
-    do {
-      a = RandomGenerator.generate(
-          seed: DateTime.now().millisecondsSinceEpoch,
-          min: config.minA,
-          max: config.maxA);
-    } while (this.a == a);
-    var b = this.b;
-    do {
-      b = RandomGenerator.generate(
-          seed: DateTime.now().millisecondsSinceEpoch + 1,
-          min: config.minB,
-          max: config.maxB);
-    } while (this.b == b);
+    var a = RandomGenerator.generate(
+        min: config.minA,
+        max: config.maxA,
+        initial: this.a,
+        seed: DateTime.now().millisecondsSinceEpoch + 1);
+    var b = RandomGenerator.generate(
+        min: config.minB,
+        max: config.maxB,
+        initial: this.b,
+        seed: DateTime.now().millisecondsSinceEpoch + 2);
     String symbol = operation == MathOperation.addition
         ? "+"
         : (operation == MathOperation.subtraction ? "-" : "");
@@ -233,6 +270,7 @@ class AdditionSubtractionState extends State<AdditionSubtractionPage> {
       print(
           "operations with negative result are not allowed, setting a new one...");
       _setOperation();
+      return;
     }
     setState(() {
       this.a = a;
