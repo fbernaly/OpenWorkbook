@@ -75,12 +75,15 @@ class ComparisonState extends State<ComparisonPage> {
       showWelcomeMessage = false;
     }
     _startHideMessageTimer();
+    var p = Platform.isIOS ? "ios" : "android";
     List<Tuple2<String, String>> pages = [
       Tuple2('tutorial_drag_symbols.png',
           'Drag or tap the symbols to enter your answer'),
-      Tuple2('tutorial_options.png', 'Tap this icon to change your options'),
-      Tuple2('tutorial_skip.png', 'Tap this button to skip problems'),
-      Tuple2('tutorial_back.png', 'Tap back when you are done practicing')
+      Tuple2('tutorial_options_' + p + '.png',
+          'Tap this icon to change your options'),
+      Tuple2('tutorial_skip_' + p + '.png', 'Tap this button to skip problems'),
+      Tuple2('tutorial_back_' + p + '.png',
+          'Tap back when you are done practicing')
     ];
     return TutorialPage(
       pages: pages,

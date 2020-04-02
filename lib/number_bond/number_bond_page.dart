@@ -75,12 +75,15 @@ class NumberBondState extends State<NumberBondPage> {
       showWelcomeMessage = false;
     }
     _startHideMessageTimer();
+    var p = Platform.isIOS ? "ios" : "android";
     List<Tuple2<String, String>> pages = [
       Tuple2('tutorial_drag_numbers_bond.png',
           'Drag or tap the numbers to enter your answer'),
-      Tuple2('tutorial_options.png', 'Tap this icon to change your options'),
-      Tuple2('tutorial_skip.png', 'Tap this button to skip problems'),
-      Tuple2('tutorial_back.png', 'Tap back when you are done practicing')
+      Tuple2('tutorial_options_' + p + '.png',
+          'Tap this icon to change your options'),
+      Tuple2('tutorial_skip_' + p + '.png', 'Tap this button to skip problems'),
+      Tuple2('tutorial_bac_' + p + 'k.png',
+          'Tap back when you are done practicing')
     ];
     return TutorialPage(
       pages: pages,

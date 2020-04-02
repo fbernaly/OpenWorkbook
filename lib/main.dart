@@ -23,9 +23,8 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
-    final androidTheme = ThemeData(
-      primarySwatch: Colors.purple,
-    );
+    final androidTheme =
+        ThemeData(primarySwatch: Colors.purple, canvasColor: Colors.white);
 
     final cupertinoTheme = CupertinoThemeData(
       primaryColor: Colors.purple,
